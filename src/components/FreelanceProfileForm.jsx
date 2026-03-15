@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Label, TextInput, Select, FileInput, Card, Spinner, Checkbox, Tabs, Badge, Button, Modal } from "flowbite-react";
+import { Label, TextInput, Select, FileInput, Card, Spinner, Checkbox, Tabs, Badge, Button, Modal, Textarea } from "flowbite-react";
 import { 
   HiUser, HiCode, HiAcademicCap, HiTrash, HiCheckCircle, 
   HiExclamationCircle, HiUpload, HiDocumentText, HiOutlineTruck, HiLink, HiPlusCircle
@@ -34,7 +34,7 @@ export default function FreelanceProfileForm() {
   const [linkedinUrl, setLinkedinUrl] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [availability, setAvailability] = useState("FULL");
-  
+  const [isActive, setIsActive] = useState(false);
   const [cvFile, setCvFile] = useState(null);
   const [cvUploading, setCvUploading] = useState(false);
 
@@ -81,6 +81,7 @@ export default function FreelanceProfileForm() {
           setLinkedinUrl(profile.freelance_linkedin_url || "");
           setWebsiteUrl(profile.freelance_website_url || "");
           setAvailability(profile.freelance_availability || "FULL");
+          setIsActive(profile.freelance_is_active || false);
           
           if (profile.freelance_soft_skills) setMySoftSkills(profile.freelance_soft_skills);
           if (profile.languages) setLanguages(profile.languages);
@@ -128,11 +129,12 @@ export default function FreelanceProfileForm() {
   };
 
   const handleCVSubmit = async () => {
-    if (!cvFile) return;
+   if (!cvFile) return;
     setCvUploading(true);
     try {
-      await updateCV(profileId, cvFile);
-      setMessage({ text: "CV soumis avec succès !", type: "success" });
+      const updatedProfile = await updateCV(profileId, cvFile);
+      setExistingCvUrl(updatedProfile.freelance_cv_file); 
+      setMessage({ text: "CV mis à jour avec succès !", type: "success" });
       setTimeout(() => setMessage({text: "", type:""}), 3000);
     } catch (error) { setMessage({ text: "Erreur lors de l'envoi du CV.", type: "error" }); } 
     finally { setCvUploading(false); setCvFile(null); }
@@ -140,14 +142,26 @@ export default function FreelanceProfileForm() {
 
   const executeDeactivate = async () => {
     setShowDeactivateModal(false);
-    await deactivateAccount();
-    window.location.reload(); 
+    try {
+      await deactivateAccount();
+      // On recharge la page : les données seront là, mais le statut is_active sera false
+      window.location.reload(); 
+    } catch (error) {
+      alert("Erreur lors de la suspension de votre compte.");
+    }
   };
 
   const executeDelete = async () => {
     setShowDeleteModal(false);
-    await deleteAccount();
-    window.location.href = '/'; 
+    try {
+      await deleteAccount();
+      // Règle de sécurité : On détruit le badge d'accès du navigateur !
+      localStorage.removeItem("token"); 
+      // On le renvoie violemment à l'accueil
+      window.location.href = '/'; 
+    } catch (error) {
+      alert("Erreur lors de la suppression de votre compte.");
+    }
   };
 
   // --- ACTIONS ONGLETS 2 & 3 ---
@@ -230,6 +244,19 @@ export default function FreelanceProfileForm() {
           <h2 className="text-2xl font-black italic">MON ESPACE EXPERT</h2>
         </div>
 
+        {!isActive && (
+          <div className="mx-6 mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 rounded-r-xl shadow-sm flex items-start">
+            <HiExclamationCircle className="h-6 w-6 mr-3 text-yellow-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-bold text-sm">Votre compte est en attente d'activation.</h3>
+              <p className="text-xs mt-1 text-yellow-700">
+                Veuillez compléter votre profil à 100% (informations générales, CV, compétences, diplômes). 
+                Une fois complété, un modérateur validera votre compte pour le rendre visible.
+              </p>
+            </div>
+          </div>
+        )}
+
         {message.text && (
           <div className={`m-4 p-4 rounded-xl font-bold ${message.type === 'success' ? 'bg-teal/20 text-teal' : 'bg-coral/20 text-coral'}`}>
             {message.text}
@@ -296,13 +323,20 @@ export default function FreelanceProfileForm() {
                  )}
 
                  <div className="flex flex-col md:flex-row items-center gap-4">
-                    <FileInput 
-                      className="flex-1 w-full" 
-                      accept=".pdf" 
-                      onChange={(e) => setCvFile(e.target.files[0])} 
-                      helperText={existingCvUrl ? "Sélectionnez un nouveau fichier PDF pour écraser le précédent." : ""}
-                    />
-                    <Button color="dark" onClick={handleCVSubmit} disabled={!cvFile || cvUploading} className="w-full md:w-auto">
+                    <div className="flex-1 w-full">
+                        <FileInput 
+                          accept=".pdf" 
+                          onChange={(e) => setCvFile(e.target.files[0])} 
+                          /* On a supprimé le helperText ici ! */
+                        />
+                        {/* On affiche le texte d'aide proprement en dessous avec un <p> */}
+                        {existingCvUrl && (
+                          <p className="mt-2 text-xs text-gray-500 font-medium">
+                            Sélectionnez un nouveau fichier PDF pour écraser le précédent.
+                          </p>
+                        )}
+                    </div>
+                    <Button color="dark" onClick={handleCVSubmit} disabled={!cvFile || cvUploading} className="w-full md:w-auto mb-auto">
                       {cvUploading ? <Spinner size="sm"/> : <><HiUpload className="mr-2"/> {existingCvUrl ? "Remplacer le CV" : "Soumettre le CV"}</>}
                     </Button>
                  </div>
@@ -333,9 +367,13 @@ export default function FreelanceProfileForm() {
                 <h3 className="text-coral font-black mb-2 flex items-center gap-2 text-lg"><HiExclamationCircle /> Gestion du compte</h3>
                 <p className="text-sm text-gray-600 mb-4">Ces actions limitent ou suppriment votre visibilité sur la plateforme de manière définitive.</p>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <button onClick={() => setShowDeactivateModal(true)} className="px-6 py-2.5 rounded-xl font-bold bg-white border-2 transition-transform hover:scale-105" style={{ color: '#CE6A6B', borderColor: '#CE6A6B' }}>
-                    Suspendre le compte
-                  </button>
+                  {/* Le bouton n'apparaît QUE si isActive est true */}
+                  {isActive && (
+                    <button onClick={() => setShowDeactivateModal(true)} className="px-6 py-2.5 rounded-xl font-bold bg-white border-2 transition-transform hover:scale-105" style={{ color: '#CE6A6B', borderColor: '#CE6A6B' }}>
+                      Suspendre le compte
+                    </button>
+                  )}
+                  {/* Le bouton Supprimer est toujours là */}
                   <button onClick={() => setShowDeleteModal(true)} className="px-6 py-2.5 rounded-xl font-bold text-white transition-transform hover:scale-105" style={{ backgroundColor: '#CE6A6B' }}>
                     Supprimer le compte
                   </button>
@@ -358,23 +396,34 @@ export default function FreelanceProfileForm() {
                       {availableSoftSkills.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                     </Select>
                   </div>
-                  <Button color="dark" onClick={() => {
-                    if (selectedSoftSkill && !mySoftSkills.includes(parseInt(selectedSoftSkill))) {
-                      setMySoftSkills([...mySoftSkills, parseInt(selectedSoftSkill)]);
-                      setSelectedSoftSkill("");
-                    }
-                  }}>
+                 <button 
+                    onClick={() => {
+                      if (selectedSoftSkill && !mySoftSkills.includes(parseInt(selectedSoftSkill))) {
+                        setMySoftSkills([...mySoftSkills, parseInt(selectedSoftSkill)]);
+                        setSelectedSoftSkill("");
+                      }
+                    }}
+                    className="px-5 py-2.5 rounded-xl font-bold text-white text-sm shadow-md transition-transform hover:scale-105 flex items-center justify-center w-full md:w-auto"
+                    style={{ backgroundColor: '#CE6A6B' }}
+                  >
                     <HiPlusCircle className="mr-2 h-5 w-5" />
                     {mySoftSkills.length > 0 ? "Ajouter un autre Soft Skill" : "Ajouter ce Soft Skill"}
-                  </Button>
+                  </button>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {mySoftSkills.map(id => (
-                    <Badge key={id} color="info" className="px-3 py-1.5 flex items-center gap-2 text-sm shadow-sm border border-blue-200">
-                      {availableSoftSkills.find(s => s.id === id)?.name}
-                      <HiTrash className="cursor-pointer ml-1 hover:text-coral" onClick={() => setMySoftSkills(mySoftSkills.filter(sId => sId !== id))} />
-                    </Badge>
-                  ))}
+                <div className="mt-4 flex flex-wrap gap-3">
+                  {mySoftSkills.map(id => {
+                    const skillName = availableSoftSkills.find(s => s.id === id)?.name;
+                    return (
+                      <div key={id} className="bg-white border border-gray-200 px-4 py-2 rounded-xl flex items-center shadow-sm transition-all hover:shadow-md">
+                        <span className="font-black text-navy mr-2">{skillName}</span>
+                        <Badge color="info"></Badge>
+                        <HiTrash 
+                          className="cursor-pointer ml-3 text-gray-400 hover:text-coral transition-colors text-lg" 
+                          onClick={() => setMySoftSkills(mySoftSkills.filter(sId => sId !== id))} 
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -396,10 +445,14 @@ export default function FreelanceProfileForm() {
                       <option value="LM">Langue maternelle</option>
                     </Select>
                   </div>
-                  <Button color="dark" onClick={handleAddLanguage} className="w-full md:w-auto">
+                  <button 
+                    onClick={handleAddLanguage} 
+                    className="px-5 py-2.5 rounded-xl font-bold text-white text-sm shadow-md transition-transform hover:scale-105 flex items-center justify-center w-full md:w-auto"
+                    style={{ backgroundColor: '#CE6A6B' }}
+                  >
                     <HiPlusCircle className="mr-2 h-5 w-5" />
                     {languages.length > 0 ? "Ajouter une autre langue" : "Ajouter cette langue"}
-                  </Button>
+                  </button>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-3">
                   {languages.map(l => (
@@ -436,10 +489,14 @@ export default function FreelanceProfileForm() {
                         <option value="5">5 - Expert</option>
                     </Select>
                   </div>
-                  <Button color="dark" onClick={handleAddHardSkill}>
+                  <button 
+                    onClick={handleAddHardSkill}
+                    className="px-5 py-2.5 rounded-xl font-bold text-white text-sm shadow-md transition-transform hover:scale-105 flex items-center justify-center w-full md:w-auto"
+                    style={{ backgroundColor: '#CE6A6B' }}
+                  >
                     <HiPlusCircle className="mr-2 h-5 w-5" />
                     {skills.length > 0 ? "Ajouter une autre" : "Ajouter"}
-                  </Button>
+                  </button>
                 </div>
 
                 <div className="mt-6 space-y-4">
@@ -500,10 +557,14 @@ export default function FreelanceProfileForm() {
                       <Label className="text-xs font-bold mb-1">Preuve PDF</Label>
                       <FileInput accept=".pdf" onChange={e => setNewEdu({...newEdu, proof_file: e.target.files[0]})} />
                     </div>
-                    <Button color="dark" onClick={handleAddEdu} className="md:col-span-2 lg:col-span-5 w-full">
+                    <button 
+                      onClick={handleAddEdu} 
+                      className="md:col-span-2 lg:col-span-5 w-full px-5 py-2.5 rounded-xl font-bold text-white text-sm shadow-md transition-transform hover:scale-105 flex items-center justify-center"
+                      style={{ backgroundColor: '#CE6A6B' }}
+                    >
                       <HiPlusCircle className="mr-2 h-5 w-5" /> 
                       {educations.length > 0 ? "Ajouter un autre diplôme" : "Ajouter ce diplôme"}
-                    </Button>
+                    </button>
                 </div>
                 
                 <div className="space-y-3">
@@ -538,10 +599,14 @@ export default function FreelanceProfileForm() {
                       <Label className="text-xs font-bold mb-1">Preuve PDF</Label>
                       <FileInput accept=".pdf" onChange={e => setNewCert({...newCert, proof_file: e.target.files[0]})} />
                     </div>
-                    <Button color="dark" onClick={handleAddCert} className="w-full md:w-auto">
+                    <button 
+                      onClick={handleAddCert} 
+                      className="px-5 py-2.5 rounded-xl font-bold text-white text-sm shadow-md transition-transform hover:scale-105 flex items-center justify-center w-full md:w-auto"
+                      style={{ backgroundColor: '#CE6A6B' }}
+                    >
                       <HiPlusCircle className="mr-2 h-5 w-5" /> 
                       {certifications.length > 0 ? "Ajouter une autre certification" : "Ajouter cette certification"}
-                    </Button>
+                    </button>
                 </div>
                 
                 <div className="space-y-3">
@@ -579,10 +644,14 @@ export default function FreelanceProfileForm() {
                       <Label className="text-xs font-bold mb-1">Preuve PDF (Optionnel)</Label>
                       <FileInput accept=".pdf" onChange={e => setNewPermis({...newPermis, proof_file: e.target.files[0]})} />
                     </div>
-                    <Button color="dark" onClick={handleAddPermis} className="w-full md:w-auto">
+                   <button 
+                      onClick={handleAddPermis} 
+                      className="px-5 py-2.5 rounded-xl font-bold text-white text-sm shadow-md transition-transform hover:scale-105 flex items-center justify-center w-full md:w-auto"
+                      style={{ backgroundColor: '#CE6A6B' }}
+                    >
                       <HiPlusCircle className="mr-2 h-5 w-5" />
                       {mesPermis.length > 0 ? "Ajouter un autre permis" : "Ajouter ce permis"}
-                    </Button>
+                    </button>
                 </div>
                 <div className="space-y-3">
                   {mesPermis.map(lic => (
@@ -620,10 +689,14 @@ export default function FreelanceProfileForm() {
                       <Label className="text-xs font-bold mb-1">Preuve PDF</Label>
                       <FileInput accept=".pdf" onChange={e => setNewLicencePro({...newLicencePro, proof_file: e.target.files[0]})} />
                     </div>
-                    <Button color="dark" onClick={handleAddLicencePro} className="w-full md:w-auto">
+                    <button 
+                      onClick={handleAddLicencePro} 
+                      className="px-5 py-2.5 rounded-xl font-bold text-white text-sm shadow-md transition-transform hover:scale-105 flex items-center justify-center w-full md:w-auto"
+                      style={{ backgroundColor: '#CE6A6B' }}
+                    >
                       <HiPlusCircle className="mr-2 h-5 w-5" />
                       {mesLicencesPro.length > 0 ? "Ajouter une autre licence" : "Ajouter cette licence"}
-                    </Button>
+                    </button>
                 </div>
                 <div className="space-y-3">
                   {mesLicencesPro.map(lic => (
@@ -659,35 +732,30 @@ export default function FreelanceProfileForm() {
 
       {/* MODALS DE CONFIRMATION */}
       <Modal show={showDeactivateModal} size="md" popup onClose={() => setShowDeactivateModal(false)}>
-        <Modal.Header />
-        <Modal.Body>
-          <div className="text-center">
-            <HiExclamationCircle className="mx-auto mb-4 h-14 w-14" style={{ color: '#CE6A6B' }} />
-            <h3 className="mb-5 text-lg font-bold text-navy">Suspendre votre compte ?</h3>
-            <p className="text-sm text-gray-500 mb-6">Vous n'apparaîtrez plus dans les recherches des entreprises, mais vos données seront conservées.</p>
-            <div className="flex justify-center gap-4">
-              <button className="px-5 py-2 rounded-lg font-bold text-white" style={{ backgroundColor: '#CE6A6B' }} onClick={executeDeactivate}>Oui, suspendre</button>
-              <button className="px-5 py-2 rounded-lg font-bold bg-gray-100 text-navy" onClick={() => setShowDeactivateModal(false)}>Annuler</button>
-            </div>
+        <div className="p-6 text-center">
+          <HiExclamationCircle className="mx-auto mb-4 h-14 w-14 mt-4" style={{ color: '#CE6A6B' }} />
+          <h3 className="mb-5 text-lg font-bold text-navy">Suspendre votre compte ?</h3>
+          <p className="text-sm text-gray-500 mb-6">Vous n'apparaîtrez plus dans les recherches des entreprises, mais vos données seront conservées.</p>
+          <div className="flex justify-center gap-4">
+            <button className="px-5 py-2 rounded-lg font-bold text-white shadow-md hover:scale-105 transition-transform" style={{ backgroundColor: '#CE6A6B' }} onClick={executeDeactivate}>Oui, suspendre</button>
+            <button className="px-5 py-2 rounded-lg font-bold bg-gray-100 text-navy hover:bg-gray-200 transition-colors" onClick={() => setShowDeactivateModal(false)}>Annuler</button>
           </div>
-        </Modal.Body>
+        </div>
       </Modal>
 
       <Modal show={showDeleteModal} size="md" popup onClose={() => setShowDeleteModal(false)}>
-        <Modal.Header />
-        <Modal.Body>
-          <div className="text-center">
-            <HiExclamationCircle className="mx-auto mb-4 h-14 w-14" style={{ color: '#CE6A6B' }} />
-            <h3 className="mb-5 text-lg font-bold text-navy">Suppression définitive</h3>
-            <p className="text-sm text-gray-500 mb-6">Attention, toutes vos données, votre CV et vos compétences seront effacés de nos serveurs de manière irréversible.</p>
-            <div className="flex justify-center gap-4">
-              <button className="px-5 py-2 rounded-lg font-bold text-white" style={{ backgroundColor: '#CE6A6B' }} onClick={executeDelete}>Oui, supprimer définitivement</button>
-              <button className="px-5 py-2 rounded-lg font-bold bg-gray-100 text-navy" onClick={() => setShowDeleteModal(false)}>Annuler</button>
-            </div>
+        <div className="p-6 text-center">
+          <HiExclamationCircle className="mx-auto mb-4 h-14 w-14 mt-4" style={{ color: '#CE6A6B' }} />
+          <h3 className="mb-5 text-lg font-bold text-navy">Suppression définitive</h3>
+          <p className="text-sm text-gray-500 mb-6">Attention, toutes vos données, votre CV et vos compétences seront effacés de nos serveurs de manière irréversible.</p>
+          <div className="flex justify-center gap-4">
+            <button className="px-5 py-2 rounded-lg font-bold text-white shadow-md hover:scale-105 transition-transform" style={{ backgroundColor: '#CE6A6B' }} onClick={executeDelete}>Oui, supprimer</button>
+            <button className="px-5 py-2 rounded-lg font-bold bg-gray-100 text-navy hover:bg-gray-200 transition-colors" onClick={() => setShowDeleteModal(false)}>Annuler</button>
           </div>
-        </Modal.Body>
+        </div>
       </Modal>
 
     </div>
   );
 }
+

@@ -51,21 +51,28 @@ export const getMySkills = async () => {
     return await response.json();
 };
 
+// --- HARD SKILLS ---
 export const addSkill = async (skillData) => {
     const token = localStorage.getItem("token");
-    const response = await fetch(`${API_URL}/my-skills/`, {
+    const res = await fetch(`${API_URL}/my-skills/`, {
         method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+        headers: { 
+            'Authorization': `Bearer ${token}`, 
+            'Content-Type': 'application/json' 
         },
         body: JSON.stringify({
-            skill: skillData.skill_name, 
-            level: skillData.skill_level
+            skill: skillData.skill_name,
+            level: parseInt(skillData.skill_level),     
+            sector_id: parseInt(skillData.sector_id)   
         }),
     });
-    if (!response.ok) throw new Error("Erreur ajout skill");
-    return await response.json();
+    
+    if (!res.ok) { 
+        const err = await res.json(); 
+        alert("Erreur Hard Skill: " + JSON.stringify(err)); 
+        throw new Error("Erreur Backend"); 
+    }
+    return await res.json();
 };
 
 export const deleteSkill = async (skillId) => {
@@ -188,11 +195,72 @@ export const updateCV = async (profileId, cvFile) => {
     return await res.json();
 }
 
+// --- GESTION DE LA VIE DU COMPTE ---
+
 export const deactivateAccount = async () => {
-    // A lier à ton endpoint de désactivation
-    console.log("Désactivation");
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/freelances/deactivate/`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Erreur lors de la suspension");
+    return await res.json();
 };
+
 export const deleteAccount = async () => {
-    // A lier à ton endpoint de suppression
-    console.log("Suppression");
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/freelances/delete_account/`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    // La suppression renvoie un status 204 (No Content), donc on ne fait pas de .json()
+    if (!res.ok) throw new Error("Erreur lors de la suppression");
+    return true; 
+};
+
+export const getCompanyProfile = async () => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/companies/`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Erreur Backend");
+    const data = await res.json();
+    return data[0]; 
+};
+
+export const updateCompanyProfile = async (id, formData) => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/companies/${id}/`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData, 
+    });
+    
+    if (!res.ok) {
+        const errorData = await res.json();
+        alert("Refus du serveur (Erreur 400) : " + JSON.stringify(errorData));
+        throw new Error("Erreur Backend");
+    }
+    
+    return await res.json();
+};
+
+export const deactivateCompanyAccount = async () => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/companies/deactivate/`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Erreur lors de la suspension");
+    return await res.json();
+};
+
+export const deleteCompanyAccount = async () => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/companies/delete_account/`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Erreur lors de la suppression");
+    return true; 
 };
