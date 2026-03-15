@@ -110,3 +110,89 @@ export const getCurrentUser = async () => {
 
     return await response.json();
 };
+
+// --- SECTEURS & SOFT SKILLS ---
+export const getSectors = async () => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/sectors/`, { headers: { 'Authorization': `Bearer ${token}` } });
+    return await res.json();
+};
+
+export const getSoftSkills = async () => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/soft-skills/`, { headers: { 'Authorization': `Bearer ${token}` } });
+    return await res.json();
+};
+
+export const addEducation = async (formData) => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/educations/`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: formData });
+    return await res.json();
+};
+export const deleteEducation = async (id) => {
+    const token = localStorage.getItem("token");
+    await fetch(`${API_URL}/educations/${id}/`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }});
+};
+
+export const addCertification = async (formData) => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/certifications/`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: formData });
+    return await res.json();
+};
+export const deleteCertification = async (id) => {
+    const token = localStorage.getItem("token");
+    await fetch(`${API_URL}/certifications/${id}/`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }});
+};
+
+export const addLicense = async (formData) => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/licenses/`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: formData });
+    return await res.json();
+};
+export const deleteLicense = async (id) => {
+    const token = localStorage.getItem("token");
+    await fetch(`${API_URL}/licenses/${id}/`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }});
+};
+
+// --- LANGUES ---
+export const addLanguage = async (data) => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/languages/`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    });
+    return await res.json();
+};
+export const deleteLanguage = async (id) => {
+    const token = localStorage.getItem("token");
+    await fetch(`${API_URL}/languages/${id}/`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }});
+};
+
+// --- CV & COMPTE ---
+export const updateCV = async (profileId, cvFile) => {
+    const token = localStorage.getItem("token");
+    const formData = new FormData();
+    formData.append("freelance_cv_file", cvFile);
+    const res = await fetch(`${API_URL}/freelances/${profileId}/`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData,
+    });
+    if (!res.ok) {
+        const errorData = await res.json();
+        console.error("Refus de Django pour le CV:", errorData);
+        throw new Error("Le serveur a refusé le fichier.");
+    }
+    
+    return await res.json();
+}
+
+export const deactivateAccount = async () => {
+    // A lier à ton endpoint de désactivation
+    console.log("Désactivation");
+};
+export const deleteAccount = async () => {
+    // A lier à ton endpoint de suppression
+    console.log("Suppression");
+};
