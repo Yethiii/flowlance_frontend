@@ -264,3 +264,85 @@ export const deleteCompanyAccount = async () => {
     if (!res.ok) throw new Error("Erreur lors de la suppression");
     return true; 
 };
+
+// ==========================================
+// --- GESTION DES ANNONCES (JOB OFFERS) ---
+// ==========================================
+
+export const getMyJobOffers = async () => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/job-offers/`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Erreur de chargement des annonces");
+    return await res.json();
+};
+
+export const createJobOffer = async (offerData) => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/job-offers/`, {
+        method: 'POST',
+        headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(offerData),
+    });
+    
+    if (!res.ok) {
+        const err = await res.json();
+        alert("Refus du serveur (Création annonce) : " + JSON.stringify(err));
+        throw new Error("Erreur Backend");
+    }
+    return await res.json();
+};
+
+export const updateJobOffer = async (id, offerData) => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/job-offers/${id}/`, {
+        method: 'PATCH',
+        headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(offerData),
+    });
+    
+    if (!res.ok) {
+        const err = await res.json();
+        alert("Refus du serveur (Mise à jour annonce) : " + JSON.stringify(err));
+        throw new Error("Erreur Backend");
+    }
+    return await res.json();
+};
+
+export const deleteJobOffer = async (id) => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/job-offers/${id}/`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Erreur lors de la suppression");
+    return true;
+};
+
+// --- L'ASSISTANT IA ---
+export const generateJobDescriptionAI = async (keywords) => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/generate-job/`, {
+        method: 'POST',
+        headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ keywords }),
+    });
+    
+    if (!res.ok) {
+        const err = await res.json();
+        alert("Erreur de l'IA : " + (err.error || JSON.stringify(err)));
+        throw new Error("Erreur IA");
+    }
+    return await res.json();
+};
+

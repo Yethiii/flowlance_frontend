@@ -2,19 +2,18 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { HiMenu, HiX } from "react-icons/hi";
 
-// 👇 1. On importe ton nouveau composant de profil !
 import CompanyProfileForm from "./CompanyProfileForm"; 
+import CompanyJobOffers from "./CompanyJobOffers";
 
 export default function DashboardCompany() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
-  // 👇 2. On crée une variable pour savoir sur quel onglet du menu on se trouve
   const [activeTab, setActiveTab] = useState("Mes Annonces"); 
 
   const handleLogout = () => {
-    localStorage.removeItem("token"); // On détruit le badge
-    navigate("/login"); // On retourne à la porte d'entrée
+    localStorage.removeItem("token"); 
+    navigate("/login"); 
   };
 
   const stats = [
@@ -42,12 +41,10 @@ export default function DashboardCompany() {
         </div>
         
         <nav className="flex-1 space-y-2">
-          {["Mes Annonces", "Recherche IA", "Candidatures", "Profil Entreprise"].map((item) => (
+          {["Tableau de bord", "Mes Annonces", "Recherche IA", "Candidatures", "Profil Entreprise"].map((item) => (
             <button 
               key={item} 
-              // 👇 3. Au clic, on change l'onglet actif et on ferme le menu sur mobile
               onClick={() => { setActiveTab(item); setIsMenuOpen(false); }}
-              // 👇 4. On change la couleur si c'est l'onglet actif !
               className={`w-full text-left p-4 rounded-xl transition-colors font-bold ${
                 activeTab === item ? "bg-white/10 text-coral" : "text-sage hover:bg-white/5"
               }`}
@@ -69,23 +66,18 @@ export default function DashboardCompany() {
       {/* ZONE PRINCIPALE (DYNAMIQUE) */}
       <main className="flex-1 p-4 md:p-10 overflow-y-auto">
         
-        {/* 👇 5. LE CŒUR DU SYSTÈME : Si on clique sur "Profil", on affiche le formulaire */}
+        {/* LE SYSTÈME D'ONGLETS */}
         {activeTab === "Profil Entreprise" ? (
-          
           <CompanyProfileForm />
-
-        ) : (
-          
-          /* SINON : On affiche ton tableau de bord actuel (par défaut "Mes Annonces") */
+        ) : activeTab === "Mes Annonces" ? (
+          <CompanyJobOffers />
+        ) : activeTab === "Tableau de bord" ? (
           <>
             <header className="flex justify-between items-center mb-8">
               <div>
                 <h1 className="text-2xl md:text-4xl font-black text-navy uppercase tracking-tight">Vos Recrutements</h1>
-                <p className="text-teal font-medium">Gérez vos annonces et découvrez les meilleurs talents.</p>
+                <p className="text-teal font-medium">Vue d'ensemble de votre activité.</p>
               </div>
-              <button className="hidden md:block bg-coral text-navy font-black px-6 py-3 rounded-xl hover:scale-105 shadow-lg">
-                + NOUVELLE ANNONCE
-              </button>
             </header>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
@@ -110,6 +102,10 @@ export default function DashboardCompany() {
               </div>
             </div>
           </>
+        ) : (
+          <div className="flex justify-center items-center h-full">
+            <h3 className="text-xl text-gray-400">L'onglet "{activeTab}" est en cours de construction...</h3>
+          </div>
         )}
       </main>
     </div>
