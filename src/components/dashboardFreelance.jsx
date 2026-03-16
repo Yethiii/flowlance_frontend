@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { HiMenu, HiX } from "react-icons/hi";
 import FreelanceProfileForm from "./FreelanceProfileForm"; 
-import FreelanceJobBoard from "./FreelanceJobBoard"; // <-- 1. L'IMPORT EST ICI
+import FreelanceJobBoard from "./FreelanceJobBoard"; 
+import FreelanceCVCoach from "./FreelanceCVCoach";
 
 export default function DashboardFreelance() {
   const navigate = useNavigate();
@@ -83,7 +84,12 @@ export default function DashboardFreelance() {
           <FreelanceJobBoard />
         )}
 
-        {/* CONDITION 3 : L'accueil avec les stats (anciennement "Mes Opportunités") */}
+        {/* CONDITION 3 : Le Coach CV IA */}
+        {activeView === "Mon CV (IA)" && (
+          <FreelanceCVCoach />
+        )}
+
+        {/* CONDITION 4 : L'accueil avec les stats (anciennement "Mes Opportunités") */}
         {activeView === "Tableau de bord" && (
           <>
             <header className="mb-8">
@@ -114,16 +120,6 @@ export default function DashboardFreelance() {
             </div>
           </>
         )}
-
-        {/* CONDITION 4 : Pour les menus pas encore codés */}
-        {activeView !== "Mon Profil" && activeView !== "Trouver une mission" && activeView !== "Tableau de bord" && (
-          <div className="flex items-center justify-center h-full">
-            <h2 className="text-2xl text-teal font-bold opacity-50 italic">
-              Le module "{activeView}" est en cours de développement...
-            </h2>
-          </div>
-        )}
-
       </main>
     </div>
   );

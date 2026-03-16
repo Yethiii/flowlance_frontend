@@ -408,3 +408,29 @@ export const getMyApplications = async () => {
     if (!res.ok) throw new Error("Erreur de chargement des candidatures");
     return await res.json();
 };
+
+// ==========================================
+// --- COACHING CV IA (FREELANCE) ---
+// ==========================================
+
+export const analyzeCVWithAI = async (cvFile) => {
+    const token = localStorage.getItem("token");
+    
+    const formData = new FormData();
+    formData.append("cv_file", cvFile);
+
+    const res = await fetch(`${API_URL}/cv-advice/`, {
+        method: 'POST',
+        headers: { 
+            'Authorization': `Bearer ${token}`
+        },
+        body: formData,
+    });
+    
+    if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.cv_file || err.error || "L'IA n'a pas pu analyser votre CV.");
+    }
+    
+    return await res.json();
+};
