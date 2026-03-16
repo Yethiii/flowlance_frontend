@@ -346,3 +346,15 @@ export const generateJobDescriptionAI = async (keywords) => {
     return await res.json();
 };
 
+export const getHardSkills = async () => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/hard-skills/`, { 
+        method: 'GET',
+        headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    });
+    if (!res.ok) throw new Error("Erreur lors de la récupération des Hard Skills");
+    return await res.json();
+};

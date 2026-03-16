@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Button, TextInput, Textarea, Select, Spinner, Modal, Badge, Card } from 'flowbite-react';
+import { Button, TextInput, Textarea, Select, Spinner, Modal, Badge, 
+        Card, Alert, Checkbox } from 'flowbite-react';
 import { 
-  HiPlus, HiPencilAlt, HiTrash, HiEye, HiSparkles, HiLocationMarker, HiBriefcase, HiX 
+  HiPlus, HiPencilAlt, HiTrash, HiEye, HiSparkles, HiLocationMarker, HiBriefcase, HiX,
+  HiInformationCircle, 
 } from 'react-icons/hi';
 import { 
   getMyJobOffers, createJobOffer, updateJobOffer, deleteJobOffer, generateJobDescriptionAI, 
@@ -19,6 +21,7 @@ export default function CompanyJobOffers() {
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState(null);
+  const [formError, setFormError] = useState("");
 
   // Données du formulaire
   const [formData, setFormData] = useState({
@@ -27,7 +30,8 @@ export default function CompanyJobOffers() {
     offer_location: '',
     offer_description: '',
     offer_hardskills: [],
-    offer_softskills: []
+    offer_softskills: [], 
+    offer_is_active: true
   });
 
   // États pour les menus déroulants d'ajout
@@ -65,6 +69,7 @@ export default function CompanyJobOffers() {
 
   // --- ACTIONS DU FORMULAIRE ---
   const handleOpenForm = (offer = null) => {
+    setFormError("");
     if (offer) {
       setFormData({
         offer_title: offer.offer_title || '',
@@ -72,13 +77,15 @@ export default function CompanyJobOffers() {
         offer_location: offer.offer_location || '',
         offer_description: offer.offer_description || '',
         offer_hardskills: offer.offer_hardskills || [],
-        offer_softskills: offer.offer_softskills || []
+        offer_softskills: offer.offer_softskills || [],
+        offer_is_active: offer.offer_is_active !== undefined ? offer.offer_is_active : true // <-- NOUVEAU
       });
       setSelectedOffer(offer);
     } else {
       setFormData({ 
         offer_title: '', offer_sector: '', offer_location: '', offer_description: '',
-        offer_hardskills: [], offer_softskills: []
+        offer_hardskills: [], offer_softskills: [],
+        offer_is_active: true // <-- NOUVEAU
       });
       setSelectedOffer(null);
     }
@@ -112,8 +119,11 @@ export default function CompanyJobOffers() {
   };
 
   const handleSave = async () => {
-    if (!formData.offer_title || !formData.offer_sector || !formData.offer_description) {
-      return alert("Veuillez remplir le titre, le secteur et la description.");
+    setFormError("");
+
+    if (!formData.offer_title || !formData.offer_sector || !formData.offer_location || !formData.offer_description) {
+      setFormError("Veuillez remplir tous les champs obligatoires marqués d'un astérisque.");
+      return; 
     }
 
     const payload = { ...formData };
@@ -129,6 +139,7 @@ export default function CompanyJobOffers() {
       fetchData(); 
     } catch (error) {
       console.error("Erreur lors de la sauvegarde", error);
+      setFormError("Une erreur est survenue lors de la sauvegarde avec le serveur.");
     }
   };
 
@@ -223,25 +234,48 @@ export default function CompanyJobOffers() {
 
       {/* MODALE DE CRÉATION / MODIFICATION */}
       <Modal show={isFormModalOpen} size="4xl" onClose={() => setIsFormModalOpen(false)}>
-        <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-white rounded-t-lg">
-          <h3 className="text-2xl font-black text-navy">
-            {selectedOffer ? "Modifier l'annonce" : "Nouvelle Annonce"}
-          </h3>
-          <button onClick={() => setIsFormModalOpen(false)} className="text-gray-400 hover:text-coral font-black text-xl px-2 transition-colors">
-            X
-          </button>
-        </div>
-        
         <div className="p-6 max-h-[70vh] overflow-y-auto bg-white">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
+            {/* 1. L'ALERTE D'ERREUR */}
+            {formError && (
+              <div className="md:col-span-2">
+                <Alert color="failure" icon={HiInformationCircle}>
+                  <span className="font-medium">Erreur !</span> {formError}
+                </Alert>
+              </div>
+            )}
+
+            <div className="md:col-span-2 flex items-start p-4 bg-gray-50 border border-gray-200 rounded-xl mb-4 shadow-sm hover:bg-gray-100 transition-colors">
+              <div className="flex items-center h-5">
+                <Checkbox 
+                  id="offer_active" 
+                  checked={formData.offer_is_active}
+                  onChange={(e) => setFormData({ ...formData, offer_is_active: e.target.checked })}
+                  className="w-5 h-5 text-teal focus:ring-teal rounded border-gray-300 cursor-pointer"
+                />
+              </div>
+              <div className="ml-3 text-sm">
+                <label htmlFor="offer_active" className="font-bold text-navy cursor-pointer">
+                  Active
+                </label>
+                <p className="text-gray-500 text-xs mt-1">
+                  Décochez cette case si vous souhaitez désactiver l'annonce, elle ne sera plus visible par le candidat.  
+                </p>
+              </div>
+            </div>
+
             <div className="md:col-span-2">
-              <label className="block text-sm font-bold text-navy mb-2">Titre de la mission *</label>
+              <label className="block text-sm font-bold text-navy mb-2">
+                Titre de la mission <span className="text-coral text-lg">*</span>
+              </label>
               <TextInput value={formData.offer_title} onChange={(e) => setFormData({...formData, offer_title: e.target.value})} placeholder="Ex: Développeur React Senior" required />
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-navy mb-2">Secteur d'activité *</label>
+              <label className="block text-sm font-bold text-navy mb-2">
+                Secteur d'activité <span className="text-coral text-lg">*</span>
+              </label>
               <Select value={formData.offer_sector} onChange={(e) => setFormData({...formData, offer_sector: e.target.value})} required>
                 <option value="">Sélectionnez un secteur...</option>
                 {sectors.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
@@ -249,11 +283,13 @@ export default function CompanyJobOffers() {
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-navy mb-2">Localisation (ou Télétravail)</label>
-              <TextInput value={formData.offer_location} onChange={(e) => setFormData({...formData, offer_location: e.target.value})} placeholder="Ex: Bruxelles (Hybride)" />
+              <label className="block text-sm font-bold text-navy mb-2">
+                Localisation (ou Télétravail) <span className="text-coral text-lg">*</span>
+              </label>
+              <TextInput value={formData.offer_location} onChange={(e) => setFormData({...formData, offer_location: e.target.value})} placeholder="Ex: Bruxelles (Hybride)" required />
             </div>
 
-            {/* --- NOUVEAU : HARD SKILLS --- */}
+            {/* --- HARD SKILLS --- */}
             <div>
               <label className="block text-sm font-bold text-navy mb-2">Hard Skills requises</label>
               <div className="flex gap-2 mb-3">
@@ -275,7 +311,7 @@ export default function CompanyJobOffers() {
               </div>
             </div>
 
-            {/* --- NOUVEAU : SOFT SKILLS --- */}
+            {/* --- SOFT SKILLS --- */}
             <div>
               <label className="block text-sm font-bold text-navy mb-2">Soft Skills requises</label>
               <div className="flex gap-2 mb-3">
@@ -309,7 +345,9 @@ export default function CompanyJobOffers() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-bold text-navy mb-2">Description complète *</label>
+              <label className="block text-sm font-bold text-navy mb-2">
+                Description complète <span className="text-coral text-lg">*</span>
+              </label>
               <Textarea rows={10} value={formData.offer_description} onChange={(e) => setFormData({...formData, offer_description: e.target.value})} placeholder="Détaillez les missions, le profil recherché..." required />
             </div>
 
