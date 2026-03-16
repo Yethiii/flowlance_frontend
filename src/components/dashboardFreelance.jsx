@@ -2,14 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { HiMenu, HiX } from "react-icons/hi";
 import FreelanceProfileForm from "./FreelanceProfileForm"; 
-import FreelanceSkillsForm from "./FreelanceSkillsForm";
+import FreelanceJobBoard from "./FreelanceJobBoard"; // <-- 1. L'IMPORT EST ICI
 
 export default function DashboardFreelance() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
-  // NOUVEAU : On crée un "Aiguilleur" interne pour savoir quel onglet afficher
-  const [activeView, setActiveView] = useState("Mes Opportunités");
+  // NOUVEAU : On met "Trouver une mission" par défaut pour que tu puisses le tester direct
+  const [activeView, setActiveView] = useState("Trouver une mission");
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -22,8 +22,8 @@ export default function DashboardFreelance() {
     { label: "Vues du profil", value: "24", color: "#212E53" },
   ];
 
-  // Le menu de navigation (facile à modifier plus tard)
-  const menuItems = ["Mes Opportunités", "Mon CV (IA)", "Messages", "Mon Profil"];
+  // 2. NOUVEAU MENU : J'ai renommé l'accueil en "Tableau de bord" et ajouté "Trouver une mission"
+  const menuItems = ["Tableau de bord", "Trouver une mission", "Mon CV (IA)", "Messages", "Mon Profil"];
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-teal/5">
@@ -47,9 +47,7 @@ export default function DashboardFreelance() {
           {menuItems.map((item) => (
             <button 
               key={item} 
-              // Quand on clique, on change la vue active et on ferme le menu sur mobile
               onClick={() => { setActiveView(item); setIsMenuOpen(false); }}
-              // Si le bouton est actif, on le met en surbrillance avec du Corail
               className={`w-full text-left p-4 rounded-xl transition-colors font-bold ${
                 activeView === item 
                   ? "bg-white/10 text-coral" 
@@ -75,13 +73,18 @@ export default function DashboardFreelance() {
       {/* ZONE PRINCIPALE DYNAMIQUE */}
       <main className="flex-1 p-4 md:p-10 overflow-y-auto">
         
-        {/* CONDITION 1 : Si on clique sur "Mon Profil" */}
+        {/* CONDITION 1 : Le composant Profil */}
         {activeView === "Mon Profil" && (
           <FreelanceProfileForm />
         )}
 
-        {/* CONDITION 2 : Si on clique sur "Mes Opportunités" (L'accueil) */}
-        {activeView === "Mes Opportunités" && (
+        {/* CONDITION 2 : Le tout nouveau composant de recherche de missions ! */}
+        {activeView === "Trouver une mission" && (
+          <FreelanceJobBoard />
+        )}
+
+        {/* CONDITION 3 : L'accueil avec les stats (anciennement "Mes Opportunités") */}
+        {activeView === "Tableau de bord" && (
           <>
             <header className="mb-8">
               <h1 className="text-2xl md:text-4xl font-black text-navy uppercase tracking-tight">Vos Opportunités</h1>
@@ -112,8 +115,8 @@ export default function DashboardFreelance() {
           </>
         )}
 
-        {/* CONDITION 3 : Pour les autres menus (en construction) */}
-        {activeView !== "Mon Profil" && activeView !== "Mes Opportunités" && (
+        {/* CONDITION 4 : Pour les menus pas encore codés */}
+        {activeView !== "Mon Profil" && activeView !== "Trouver une mission" && activeView !== "Tableau de bord" && (
           <div className="flex items-center justify-center h-full">
             <h2 className="text-2xl text-teal font-bold opacity-50 italic">
               Le module "{activeView}" est en cours de développement...

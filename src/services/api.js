@@ -358,3 +358,53 @@ export const getHardSkills = async () => {
     if (!res.ok) throw new Error("Erreur lors de la récupération des Hard Skills");
     return await res.json();
 };
+
+// ==========================================
+// --- EXPLORATION & CANDIDATURES (FREELANCE) ---
+// ==========================================
+
+export const getAvailableJobOffers = async () => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/job-offers/`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Erreur de chargement des offres");
+    return await res.json();
+};
+
+export const applyToJob = async (jobId, coverMessage) => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/applications/`, {
+        method: 'POST',
+        headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ job_offer: jobId, cover_message: coverMessage }),
+    });
+    
+    if (!res.ok) {
+        const err = await res.json();
+        if (err.non_field_errors) throw new Error("Vous avez déjà postulé à cette mission !");
+        throw new Error("Erreur lors de la candidature.");
+    }
+    return await res.json();
+};
+
+export const getCompanyProfileById = async (id) => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/companies/${id}/`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Impossible de charger le profil de l'entreprise");
+    return await res.json();
+};
+
+export const getMyApplications = async () => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/applications/`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Erreur de chargement des candidatures");
+    return await res.json();
+};

@@ -160,7 +160,13 @@ export default function CompanyJobOffers() {
     setIsGenerating(true);
     try {
       const response = await generateJobDescriptionAI(aiKeywords);
-      setFormData({ ...formData, offer_description: response.generated_text || response.description || response });
+      
+      if (response.generated_description) {
+        setFormData({ ...formData, offer_description: response.generated_description });
+      } else {
+        alert("L'IA n'a pas renvoyé de texte.");
+      }
+      
     } catch (error) {
       console.error("Erreur IA", error);
     } finally {
@@ -338,9 +344,30 @@ export default function CompanyJobOffers() {
               <p className="text-xs text-gray-500 mb-3">Saisissez quelques mots-clés et laissez notre IA rédiger une annonce professionnelle et attractive.</p>
               <div className="flex gap-3">
                 <TextInput className="flex-1" value={aiKeywords} onChange={(e) => setAiKeywords(e.target.value)} placeholder="Ex: admin sys, linux, docker, 3 mois, remote..." />
-                <Button color="dark" onClick={handleGenerateAI} disabled={isGenerating}>
-                  {isGenerating ? <Spinner size="sm"/> : "Générer"}
-                </Button>
+                
+                <button 
+                  type="button" 
+                  onClick={handleGenerateAI} 
+                  disabled={isGenerating}
+                  className={`bg-navy text-white font-bold px-6 rounded-lg transition-all duration-200 flex items-center justify-center min-w-[140px] shadow-md ${
+                    isGenerating 
+                      ? 'opacity-70 cursor-wait' 
+                      : 'hover:bg-teal hover:scale-105 hover:shadow-lg'
+                  }`}
+                >
+                  {isGenerating ? (
+                    <>
+                      <Spinner size="sm" className="mr-2" />
+                      Création...
+                    </>
+                  ) : (
+                    <>
+                      <HiSparkles className="mr-2 h-5 w-5" />
+                      Générer
+                    </>
+                  )}
+                </button>
+
               </div>
             </div>
 
