@@ -40,6 +40,8 @@ export default function FreelanceProfileForm() {
 
   // ================= ONGLET 2 : COMPÉTENCES & LANGUES =================
   const [sectors, setSectors] = useState([]);
+  const [mySectors, setMySectors] = useState([]);
+  const [selectedSector, setSelectedSector] = useState("");
   const [skills, setSkills] = useState([]);
   const [newSkill, setNewSkill] = useState({ name: "", level: "1", sector_id: "" });
   
@@ -84,6 +86,7 @@ export default function FreelanceProfileForm() {
           setIsActive(profile.freelance_is_active || false);
           
           if (profile.freelance_soft_skills) setMySoftSkills(profile.freelance_soft_skills);
+          if (profile.freelance_sectors) setMySectors(profile.freelance_sectors);
           if (profile.languages) setLanguages(profile.languages);
           if (profile.educations) setEducations(profile.educations);
           if (profile.certifications) setCertifications(profile.certifications);
@@ -119,6 +122,7 @@ export default function FreelanceProfileForm() {
 
     formData.append("freelance_availability", availability);
     mySoftSkills.forEach(id => formData.append("freelance_soft_skills", id));
+    mySectors.forEach(id => formData.append("freelance_sectors", id));
     if (cvFile) formData.append("freelance_cv_file", cvFile);
 
     try {
@@ -427,6 +431,49 @@ export default function FreelanceProfileForm() {
                 </div>
               </div>
 
+              {/* --- NOUVEAU : BLOC DES SECTEURS D'ACTIVITÉ --- */}
+              <div className="bg-teal/5 p-6 rounded-2xl border border-teal/20 mb-8">
+                <h3 className="text-lg font-black text-navy mb-2 border-b border-teal/20 pb-2">Mes Secteurs d'Activité</h3>
+                
+                <div className="flex flex-col md:flex-row gap-4 items-end mb-4">
+                  <div className="flex-1 w-full">
+                    <Select value={selectedSector} onChange={(e) => setSelectedSector(e.target.value)}>
+                      <option value="">Choisir un secteur d'activité...</option>
+                      {sectors.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                    </Select>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      if (selectedSector && !mySectors.includes(parseInt(selectedSector))) {
+                        setMySectors([...mySectors, parseInt(selectedSector)]);
+                        setSelectedSector("");
+                      }
+                    }}
+                    className="px-5 py-2.5 rounded-xl font-bold text-white text-sm shadow-md transition-transform hover:scale-105 flex items-center justify-center w-full md:w-auto"
+                    style={{ backgroundColor: '#CE6A6B' }} 
+                  >
+                    <HiPlusCircle className="mr-2 h-5 w-5" />
+                    {mySectors.length > 0 ? "Ajouter un autre secteur" : "Ajouter ce secteur"}
+                  </button>
+                </div>
+                
+                <div className="mt-4 flex flex-wrap gap-3">
+                  {mySectors.map(id => {
+                    const sectorName = sectors.find(s => s.id === id)?.name;
+                    return (
+                      <div key={id} className="bg-white border border-teal/30 px-4 py-2 rounded-xl flex items-center shadow-sm transition-all hover:shadow-md">
+                        <span className="font-black text-navy mr-2">{sectorName}</span>
+                        <HiTrash 
+                          className="cursor-pointer ml-3 text-gray-400 hover:text-coral transition-colors text-lg" 
+                          onClick={() => setMySectors(mySectors.filter(sId => sId !== id))} 
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              {/* --- FIN DU BLOC SECTEURS --- */}
+
               <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
                 <h3 className="text-lg font-black text-navy mb-4 border-b pb-2">Langues Parlées</h3>
                 <div className="flex flex-col md:flex-row gap-4 items-end">
@@ -459,7 +506,13 @@ export default function FreelanceProfileForm() {
                     <div key={l.id} className="bg-white border border-gray-200 px-4 py-2 rounded-xl flex items-center shadow-sm">
                       <span className="font-black text-navy mr-2">{l.language}</span> 
                       <Badge color="gray">{l.level}</Badge>
-                      <HiTrash className="cursor-pointer ml-3 text-gray-400 hover:text-coral" onClick={() => deleteLanguage(l.id).then(() => window.location.reload())} />
+                      <HiTrash 
+                          className="cursor-pointer ml-3 text-gray-400 hover:text-coral transition-colors text-lg" 
+                          onClick={async () => {
+                            await deleteLanguage(l.id);
+                            setLanguages(languages.filter(lang => lang.id !== l.id));
+                          }} 
+                        />
                     </div>
                   ))}
                 </div>
@@ -472,8 +525,21 @@ export default function FreelanceProfileForm() {
                     <Label className="font-bold text-xs uppercase block mb-1">Secteur <span className="text-coral">*</span></Label>
                     <Select value={newSkill.sector_id} onChange={e => setNewSkill({...newSkill, sector_id: e.target.value})}>
                       <option value="">Choisir...</option>
-                      {sectors.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                      
+                      {/* On filtre la liste globale pour ne garder QUE les secteurs déjà présents dans mySectors */}
+                      {sectors
+                        .filter(s => mySectors.includes(s.id))
+                        .map(s => <option key={s.id} value={s.id}>{s.name}</option>)
+                      }
+
                     </Select>
+                    
+                    {/* Petit message d'aide si la liste est vide */}
+                    {mySectors.length === 0 && (
+                      <p className="text-xs text-coral mt-1 italic">
+                        Ajoutez d'abord un secteur d'activité ci-dessus.
+                      </p>
+                    )}
                   </div>
                   <div>
                     <Label className="font-bold text-xs uppercase block mb-1">Compétence <span className="text-coral">*</span></Label>
@@ -508,8 +574,14 @@ export default function FreelanceProfileForm() {
                           <div key={s.id} className="bg-white border border-gray-200 px-4 py-2 rounded-xl flex items-center shadow-sm">
                             <span className="font-black text-navy mr-2">{s.skill_name}</span>
                             <Badge color="light">Lvl {s.level}</Badge>
-                            <HiTrash className="cursor-pointer ml-3 text-gray-400 hover:text-coral" onClick={() => deleteSkill(s.id).then(() => window.location.reload())} />
-                          </div>
+                            <HiTrash 
+                              className="cursor-pointer ml-3 text-gray-400 hover:text-coral transition-colors text-lg" 
+                              onClick={async () => {
+                                await deleteSkill(s.id);
+                                // On met à jour l'affichage en filtrant la compétence supprimée
+                                setSkills(skills.filter(skill => skill.id !== s.id)); 
+                              }} 
+                            />                          </div>
                         ))}
                       </div>
                     </div>
@@ -577,7 +649,13 @@ export default function FreelanceProfileForm() {
                           {edu.proof_file && <span className="text-xs text-sage flex items-center gap-1"><HiDocumentText/> Document transmis</span>}
                         </div>
                       </div>
-                      <HiTrash className="text-coral cursor-pointer text-xl" onClick={() => deleteEducation(edu.id).then(() => window.location.reload())} />
+                      <HiTrash 
+                        className="text-coral cursor-pointer text-xl transition-transform hover:scale-110" 
+                        onClick={async () => {
+                          await deleteEducation(edu.id);
+                          setEducations(educations.filter(e => e.id !== edu.id));
+                        }} 
+                      />
                     </div>
                   ))}
                 </div>
@@ -619,7 +697,13 @@ export default function FreelanceProfileForm() {
                           {cert.expiry_date && <span className="text-xs text-gray-500">Expire le : {cert.expiry_date}</span>}
                         </div>
                       </div>
-                      <HiTrash className="text-coral cursor-pointer text-xl" onClick={() => deleteCertification(cert.id).then(() => window.location.reload())} />
+                      <HiTrash 
+                        className="text-coral cursor-pointer text-xl transition-transform hover:scale-110" 
+                        onClick={async () => {
+                          await deleteCertification(cert.id);
+                          setCertifications(certifications.filter(c => c.id !== cert.id));
+                        }} 
+                      />
                     </div>
                   ))}
                 </div>
@@ -662,7 +746,13 @@ export default function FreelanceProfileForm() {
                           {renderStatusBadge(lic.is_verified)}
                         </div>
                       </div>
-                      <HiTrash className="text-coral cursor-pointer text-xl" onClick={() => deleteLicense(lic.id).then(() => window.location.reload())} />
+                      <HiTrash 
+                        className="text-coral cursor-pointer text-xl transition-transform hover:scale-110" 
+                        onClick={async () => {
+                          await deleteLicense(lic.id);
+                          setLicenses(licenses.filter(license => license.id !== lic.id));
+                        }} 
+                      />
                     </div>
                   ))}
                 </div>

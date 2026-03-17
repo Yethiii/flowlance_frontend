@@ -434,3 +434,25 @@ export const analyzeCVWithAI = async (cvFile) => {
     
     return await res.json();
 };
+
+// ==========================================
+// --- DASHBOARDS & MATCHING IA ---
+// ==========================================
+
+export const getFreelanceDashboardData = async () => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/dashboard/freelance/`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Erreur de chargement du dashboard freelance");
+    return await res.json();
+};
+
+export const getCompanyDashboardData = async () => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/dashboard/company/`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Erreur de chargement du dashboard entreprise");
+    return await res.json();
+};

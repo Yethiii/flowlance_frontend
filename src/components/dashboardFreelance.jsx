@@ -1,29 +1,50 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { HiMenu, HiX } from "react-icons/hi";
+import { Spinner } from "flowbite-react";
+
 import FreelanceProfileForm from "./FreelanceProfileForm"; 
 import FreelanceJobBoard from "./FreelanceJobBoard"; 
 import FreelanceCVCoach from "./FreelanceCVCoach";
+import { getFreelanceDashboardData } from "../services/api"; // L'import de la requête
 
 export default function DashboardFreelance() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
-  // NOUVEAU : On met "Trouver une mission" par défaut pour que tu puisses le tester direct
-  const [activeView, setActiveView] = useState("Trouver une mission");
+  const [activeView, setActiveView] = useState("Tableau de bord");
+
+  // --- NOUVEAUX ÉTATS POUR L'IA ---
+  const [aiMatches, setAiMatches] = useState([]);
+  const [isDashboardLoading, setIsDashboardLoading] = useState(false);
+
+  // --- CHARGEMENT DU MATCHING IA ---
+  useEffect(() => {
+    // On ne déclenche la requête IA que si l'onglet actif est le Tableau de bord
+    if (activeView === "Tableau de bord") {
+      const fetchMatches = async () => {
+        setIsDashboardLoading(true);
+        try {
+          const data = await getFreelanceDashboardData();
+          // Le backend renvoie {"dashboard": [ {job_id: 1, score: 85, explication: "..."} ]}
+          if (data.dashboard && Array.isArray(data.dashboard)) {
+            setAiMatches(data.dashboard);
+          }
+        } catch (error) {
+          console.error("Erreur Dashboard IA", error);
+        } finally {
+          setIsDashboardLoading(false);
+        }
+      };
+      
+      fetchMatches();
+    }
+  }, [activeView]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");
   };
 
-  const stats = [
-    { label: "Nouveaux Matchs", value: "8", color: "#CE6A6B" },
-    { label: "Offres sauvées", value: "3", color: "#4A919E" },
-    { label: "Vues du profil", value: "24", color: "#212E53" },
-  ];
-
-  // 2. NOUVEAU MENU : J'ai renommé l'accueil en "Tableau de bord" et ajouté "Trouver une mission"
   const menuItems = ["Tableau de bord", "Trouver une mission", "Mon CV (IA)", "Messages", "Mon Profil"];
 
   return (
@@ -60,12 +81,8 @@ export default function DashboardFreelance() {
           ))}
         </nav>
 
-        {/* BOUTON DÉCONNEXION */}
         <div className="mt-auto border-t border-white/10 pt-4">
-          <button 
-            onClick={handleLogout} 
-            className="text-coral font-bold p-4 hover:underline w-full text-left"
-          >
+          <button onClick={handleLogout} className="text-coral font-bold p-4 hover:underline w-full text-left">
             Déconnexion
           </button>
         </div>
@@ -74,52 +91,70 @@ export default function DashboardFreelance() {
       {/* ZONE PRINCIPALE DYNAMIQUE */}
       <main className="flex-1 p-4 md:p-10 overflow-y-auto">
         
-        {/* CONDITION 1 : Le composant Profil */}
-        {activeView === "Mon Profil" && (
-          <FreelanceProfileForm />
-        )}
+        {activeView === "Mon Profil" && <FreelanceProfileForm />}
+        {activeView === "Trouver une mission" && <FreelanceJobBoard />}
+        {activeView === "Mon CV (IA)" && <FreelanceCVCoach />}
 
-        {/* CONDITION 2 : Le tout nouveau composant de recherche de missions ! */}
-        {activeView === "Trouver une mission" && (
-          <FreelanceJobBoard />
-        )}
-
-        {/* CONDITION 3 : Le Coach CV IA */}
-        {activeView === "Mon CV (IA)" && (
-          <FreelanceCVCoach />
-        )}
-
-        {/* CONDITION 4 : L'accueil avec les stats (anciennement "Mes Opportunités") */}
+        {/* --- LE NOUVEAU TABLEAU DE BORD CONNECTÉ À L'IA --- */}
         {activeView === "Tableau de bord" && (
           <>
-            <header className="mb-8">
-              <h1 className="text-2xl md:text-4xl font-black text-navy uppercase tracking-tight">Vos Opportunités</h1>
-              <p className="text-teal font-medium">L'IA de Flowlance a trouvé de nouveaux matchs pour vous.</p>
+            <header className="mb-10">
+              <h1 className="text-2xl md:text-4xl font-black text-navy uppercase tracking-tight">Vos Recommandations</h1>
+              <p className="text-teal font-medium mt-2">Notre IA a analysé les annonces actives pour vous proposer les missions les plus compatibles.</p>
             </header>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-              {stats.map((stat, index) => (
-                <div key={index} className="bg-white p-6 rounded-2xl shadow-sm border-l-8" style={{ borderColor: stat.color }}>
-                  <p className="text-teal font-semibold uppercase text-[10px] tracking-widest mb-1">{stat.label}</p>
-                  <p className="text-3xl font-black text-navy">{stat.value}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="bg-navy rounded-3xl p-6 shadow-2xl">
-              <h3 className="text-xl font-bold text-coral italic mb-6">Meilleur Match IA</h3>
-              <div className="bg-white/5 p-4 rounded-2xl border border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div>
-                  <h4 className="text-sage font-bold text-lg">Développeur Fullstack React/Django</h4>
-                  <p className="text-white/40 text-xs">Entreprise : TechCorp • Match à 95%</p>
-                </div>
-                <button className="bg-coral text-navy font-black px-6 py-3 rounded-xl hover:scale-105 transition-transform text-sm">
-                  POSTULER
-                </button>
+            {isDashboardLoading ? (
+              <div className="flex flex-col items-center justify-center py-20">
+                <Spinner size="xl" className="mb-4 text-coral" />
+                <p className="text-navy font-bold">L'Intelligence Artificielle analyse votre profil...</p>
               </div>
-            </div>
+            ) : (
+              <div className="space-y-6">
+                {aiMatches.length > 0 ? (
+                  aiMatches.map((match, index) => (
+                    <div key={index} className="bg-navy rounded-3xl p-6 shadow-2xl relative overflow-hidden border-l-8 border-coral">
+                      {/* Badge Score IA */}
+                      <div className="absolute top-0 right-0 bg-coral text-white font-black px-6 py-2 rounded-bl-3xl shadow-lg flex items-center">
+                        <span className="text-sm mr-2 text-white/80">Match :</span> {match.score}%
+                      </div>
+                      
+                      <h3 className="text-xl font-bold text-coral italic mb-4">Opportunité recommandée</h3>
+                      
+                      <div className="bg-white/5 p-5 rounded-2xl border border-white/10 flex flex-col sm:flex-row justify-between items-center gap-6">
+                        <div className="flex-1">
+                          <p className="text-white/90 text-sm leading-relaxed whitespace-pre-wrap">
+                            {match.explication}
+                          </p>
+                        </div>
+                        <button 
+                          onClick={() => setActiveView("Trouver une mission")}
+                          className="bg-coral text-white font-black px-6 py-3 rounded-xl hover:scale-105 transition-transform text-sm whitespace-nowrap shadow-md"
+                        >
+                          ALLER POSTULER
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="bg-white p-10 rounded-3xl text-center shadow-sm border border-gray-100">
+                    <p className="text-gray-500 font-medium text-lg">Aucune recommandation pour le moment.</p>
+                    <p className="text-gray-400 text-sm mt-2">Vérifiez que votre profil est complet (compétences, secteurs) et attendez de nouvelles annonces ciblées !</p>
+                  </div>
+                )}
+              </div>
+            )}
           </>
         )}
+
+        {/* CONDITION 5 : Pour les menus pas encore codés */}
+        {activeView !== "Mon Profil" && activeView !== "Trouver une mission" && activeView !== "Tableau de bord" && activeView !== "Mon CV (IA)" && (
+          <div className="flex items-center justify-center h-full">
+            <h2 className="text-2xl text-teal font-bold opacity-50 italic">
+              Le module "{activeView}" est en cours de développement...
+            </h2>
+          </div>
+        )}
+
       </main>
     </div>
   );
