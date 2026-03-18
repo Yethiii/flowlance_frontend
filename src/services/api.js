@@ -456,3 +456,4 @@ export const getCompanyDashboardData = async () => {
     if (!res.ok) throw new Error("Erreur de chargement du dashboard entreprise");
     return await res.json();
 };
+

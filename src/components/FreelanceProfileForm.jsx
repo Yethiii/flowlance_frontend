@@ -37,6 +37,8 @@ export default function FreelanceProfileForm() {
   const [isActive, setIsActive] = useState(false);
   const [cvFile, setCvFile] = useState(null);
   const [cvUploading, setCvUploading] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
 
   // ================= ONGLET 2 : COMPÉTENCES & LANGUES =================
   const [sectors, setSectors] = useState([]);
@@ -96,6 +98,8 @@ export default function FreelanceProfileForm() {
         setSkills(skillList);
         setSectors(sectorList);
         setAvailableSoftSkills(softList);
+        setFirstName(profile.first_name || "");
+        setLastName(profile.last_name || "");
       } catch (err) { console.error(err); } 
       finally { setIsLoading(false); }
     };
@@ -119,6 +123,8 @@ export default function FreelanceProfileForm() {
     if (githubUrl) formData.append("freelance_github_url", formatUrl(githubUrl));
     if (linkedinUrl) formData.append("freelance_linkedin_url", formatUrl(linkedinUrl));
     if (websiteUrl) formData.append("freelance_website_url", formatUrl(websiteUrl));
+    if (firstName) formData.append("first_name", firstName);
+    if (lastName) formData.append("last_name", lastName);
 
     formData.append("freelance_availability", availability);
     mySoftSkills.forEach(id => formData.append("freelance_soft_skills", id));
@@ -274,6 +280,14 @@ export default function FreelanceProfileForm() {
             <div className="space-y-6 p-4">
               
               <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <Label className="font-bold mb-2 block">Prénom <span className="text-coral">*</span></Label>
+                  <TextInput placeholder="Votre prénom" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
+                </div>
+                <div>
+                  <Label className="font-bold mb-2 block">Nom <span className="text-coral">*</span></Label>
+                  <TextInput placeholder="Votre nom" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
+                </div>
                 <div>
                   <Label className="font-bold mb-2 block">Date de naissance <span className="text-coral">*</span></Label>
                   <TextInput type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} required />
