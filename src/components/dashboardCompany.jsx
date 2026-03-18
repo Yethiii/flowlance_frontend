@@ -102,7 +102,9 @@ export default function DashboardCompany() {
                               <div className="flex items-start gap-4">
                                 <div className="h-12 w-12 bg-teal/20 text-teal rounded-full flex items-center justify-center text-2xl flex-shrink-0"><HiUserCircle /></div>
                                 <div className="flex-1 pr-24">
-                                  <h3 className="text-lg font-bold text-navy mb-2">Candidat N°{freelance.freelance_id}</h3>
+                                  <h3 className="text-lg font-bold text-navy mb-2">
+                                    {freelance.first_name ? `${freelance.first_name} ${freelance.last_name?.charAt(0)}.` : `Candidat N°${freelance.freelance_id}`}
+                                  </h3>
                                   <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap bg-white p-4 rounded-xl border border-gray-100 italic">
                                     "{freelance.explication}"
                                   </p>
