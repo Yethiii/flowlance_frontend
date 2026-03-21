@@ -6,6 +6,7 @@ import CompanyApplications from "./CompanyApplications";
 import CompanyProfileForm from "./CompanyProfileForm"; 
 import CompanyJobOffers from "./CompanyJobOffers";
 import { getCompanyDashboardData } from "../services/api";
+import FreelanceProfileModal from "./FreelanceProfileModal";
 
 export default function DashboardCompany() {
   const navigate = useNavigate();
@@ -147,14 +148,11 @@ export default function DashboardCompany() {
       </main>
 
       {/* --- MODALES "POUR LA SUITE" --- */}
-      <Modal show={isCandidateModalOpen} size="md" onClose={() => setIsCandidateModalOpen(false)}>
-        <div className="p-6 text-center bg-gray-50 rounded-lg">
-          <HiCog className="mx-auto mb-4 h-14 w-14 text-teal opacity-50" />
-          <h3 className="mb-2 text-xl font-black text-navy">Profil du Candidat N°{selectedFreelanceId}</h3>
-          <p className="text-sm text-gray-500 mb-6">La vue détaillée du profil freelance sera connectée à la base de données dans la prochaine étape !</p>
-          <button className="px-5 py-2 rounded-lg font-bold bg-coral text-white" onClick={() => setIsCandidateModalOpen(false)}>Fermer</button>
-        </div>
-      </Modal>
+      <FreelanceProfileModal 
+        show={isCandidateModalOpen} 
+        onClose={() => setIsCandidateModalOpen(false)} 
+        freelanceId={selectedFreelanceId} 
+      />
 
       <Modal show={isMessageModalOpen} size="md" onClose={() => setIsMessageModalOpen(false)}>
         <div className="p-6 text-center bg-gray-50 rounded-lg">

@@ -459,22 +459,69 @@ export const getCompanyDashboardData = async () => {
 
 // --- GESTION DES CANDIDATURES (CÔTÉ ENTREPRISE) ---
 
-// 1. Récupérer toutes les candidatures reçues par l'entreprise
 export const getCompanyApplications = async () => {
-  try {
-    const response = await api.get('company/applications/');
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error.message;
-  }
+    const token = localStorage.getItem("token");
+    const response = await fetch(`${API_URL}/company/applications/`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    });
+    
+    if (!response.ok) {
+        throw new Error("Erreur lors de la récupération des candidatures");
+    }
+    return await response.json();
 };
 
-// 2. Mettre à jour le statut d'une candidature (Accepter / Refuser)
-export const updateApplicationStatus = async (applicationId, status) => {
-  try {
-    const response = await api.patch(`applications/${applicationId}/status/`, { status });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error.message;
-  }
+export const updateApplicationStatus = async (applicationId, status, rejectionMessage = "") => {
+    const token = localStorage.getItem("token");
+    const response = await fetch(`${API_URL}/applications/${applicationId}/status/`, {
+        method: 'PATCH',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status, rejection_message: rejectionMessage })
+    });
+    
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Erreur lors de la mise à jour du statut");
+    }
+    return await response.json();
+};
+
+// Ajoute la fonction de l'IA :
+export const generateRejectionMessageAI = async (freelanceName, jobTitle, draftMessage = "") => {
+    const token = localStorage.getItem("token");
+    const response = await fetch(`${API_URL}/generate-rejection/`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ freelance_name: freelanceName, job_title: jobTitle, draft_message: draftMessage })
+    });
+    
+    if (!response.ok) throw new Error("Erreur IA");
+    return await response.json();
+};
+
+// --- PROFIL FREELANCE (VU PAR L'ENTREPRISE) ---
+export const getFreelanceProfileById = async (id) => {
+    const token = localStorage.getItem("token");
+    const response = await fetch(`${API_URL}/freelances/${id}/`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    });
+    
+    if (!response.ok) {
+        throw new Error("Impossible de charger le profil du freelance");
+    }
+    return await response.json();
 };
