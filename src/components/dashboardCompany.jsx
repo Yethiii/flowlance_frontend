@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { HiMenu, HiX, HiUserCircle, HiBriefcase, HiOutlineChatAlt2, HiUser, HiCog} from "react-icons/hi";
 import { Spinner, Modal } from "flowbite-react";
-
+import CompanyApplications from "./CompanyApplications";
 import CompanyProfileForm from "./CompanyProfileForm"; 
 import CompanyJobOffers from "./CompanyJobOffers";
 import { getCompanyDashboardData } from "../services/api";
@@ -76,6 +76,7 @@ export default function DashboardCompany() {
       <main className="flex-1 p-4 md:p-10 overflow-y-auto">
         {activeView === "Mon Entreprise" && <CompanyProfileForm />}
         {activeView === "Mes Annonces" && <CompanyJobOffers />}
+        {activeView === "Candidatures" && <CompanyApplications />}
 
         {activeView === "Tableau de bord" && (
           <>
@@ -103,10 +104,15 @@ export default function DashboardCompany() {
                                 <div className="h-12 w-12 bg-teal/20 text-teal rounded-full flex items-center justify-center text-2xl flex-shrink-0"><HiUserCircle /></div>
                                 <div className="flex-1 pr-24">
                                   <h3 className="text-lg font-bold text-navy mb-2">
-                                    {freelance.first_name ? `${freelance.first_name} ${freelance.last_name?.charAt(0)}.` : `Candidat N°${freelance.freelance_id}`}
+                                    <span>
+                                        {freelance.first_name 
+                                          ? `${freelance.first_name} ${freelance.last_name ? freelance.last_name.charAt(0) + '.' : ''}` 
+                                          : `Candidat N°${freelance.freelance_id}`
+                                        }
+                                    </span>                                  
                                   </h3>
                                   <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap bg-white p-4 rounded-xl border border-gray-100 italic">
-                                    "{freelance.explication}"
+                                    <span>"{freelance.explication}"</span>
                                   </p>
                                 </div>
                               </div>
@@ -136,6 +142,8 @@ export default function DashboardCompany() {
             )}
           </>
         )}
+
+        
       </main>
 
       {/* --- MODALES "POUR LA SUITE" --- */}
@@ -156,6 +164,7 @@ export default function DashboardCompany() {
           <button className="px-5 py-2 rounded-lg font-bold bg-coral text-white" onClick={() => setIsMessageModalOpen(false)}>Fermer</button>
         </div>
       </Modal>
+
 
     </div>
   );

@@ -457,3 +457,24 @@ export const getCompanyDashboardData = async () => {
     return await res.json();
 };
 
+// --- GESTION DES CANDIDATURES (CÔTÉ ENTREPRISE) ---
+
+// 1. Récupérer toutes les candidatures reçues par l'entreprise
+export const getCompanyApplications = async () => {
+  try {
+    const response = await api.get('company/applications/');
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
+// 2. Mettre à jour le statut d'une candidature (Accepter / Refuser)
+export const updateApplicationStatus = async (applicationId, status) => {
+  try {
+    const response = await api.patch(`applications/${applicationId}/status/`, { status });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};

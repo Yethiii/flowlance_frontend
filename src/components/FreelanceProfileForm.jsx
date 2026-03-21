@@ -115,20 +115,20 @@ export default function FreelanceProfileForm() {
       if (!url.startsWith("http://") && !url.startsWith("https://")) return "https://" + url;
       return url;
     };
-    if (birthDate) formData.append("freelance_birth_date", birthDate);
-    if (gender) formData.append("freelance_gender", gender);
-    formData.append("freelance_location", location);
+    formData.append("freelance_birth_date", birthDate || "");
+    formData.append("freelance_gender", gender || "");
+    formData.append("freelance_location", location || "");
     formData.append("freelance_full_remote", fullRemote);
-    formData.append("freelance_enterprise_number", enterpriseNumber);
-    if (githubUrl) formData.append("freelance_github_url", formatUrl(githubUrl));
-    if (linkedinUrl) formData.append("freelance_linkedin_url", formatUrl(linkedinUrl));
-    if (websiteUrl) formData.append("freelance_website_url", formatUrl(websiteUrl));
-    if (firstName) formData.append("first_name", firstName);
-    if (lastName) formData.append("last_name", lastName);
-
+    formData.append("freelance_enterprise_number", enterpriseNumber || "");
+    formData.append("first_name", firstName || "");
+    formData.append("last_name", lastName || "");
+    formData.append("freelance_github_url", formatUrl(githubUrl));
+    formData.append("freelance_linkedin_url", formatUrl(linkedinUrl));
+    formData.append("freelance_website_url", formatUrl(websiteUrl));
     formData.append("freelance_availability", availability);
     mySoftSkills.forEach(id => formData.append("freelance_soft_skills", id));
     mySectors.forEach(id => formData.append("freelance_sectors", id));
+    
     if (cvFile) formData.append("freelance_cv_file", cvFile);
 
     try {
