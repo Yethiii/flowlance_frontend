@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { HiMenu, HiX, HiBriefcase, HiOutlinePaperAirplane, HiCheckCircle, HiLocationMarker, HiOfficeBuilding, HiGlobeAlt, HiUsers, HiPhone, HiIdentification, HiInformationCircle } from "react-icons/hi";
+import { HiMenu, HiX, HiUserCircle, HiBriefcase, HiSearch, 
+  HiLocationMarker, HiStar, HiCurrencyEuro, HiClock, 
+  HiOfficeBuilding, HiOutlinePaperAirplane, HiCheckCircle, 
+  HiXCircle, HiOutlineMail, HiSparkles } from "react-icons/hi";
 import { Spinner, Modal, Textarea, Alert, Badge } from "flowbite-react";
 
 import FreelanceProfileForm from "./FreelanceProfileForm"; 
@@ -111,8 +114,7 @@ export default function DashboardFreelance() {
     finally { setIsLoadingCompany(false); }
   };
 
-  const menuItems = ["Tableau de bord", "Trouver une mission", "Mon CV (IA)", "Messages", "Mon Profil"];
-
+const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures", "Mon CV (IA)", "Mon Profil"];
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-teal/5">
       {/* ... (HEADER ET SIDEBAR IDENTIQUES) ... */}
@@ -312,7 +314,87 @@ export default function DashboardFreelance() {
             )}
           </div>
         </Modal>
+            {/* ================= ONGLET : MES CANDIDATURES ================= */}
+        {activeView === "Mes Candidatures" && (
+          <>
+            <header className="mb-10">
+              <h1 className="text-2xl md:text-4xl font-black text-navy uppercase tracking-tight">Mes Candidatures</h1>
+              <p className="text-teal font-medium mt-2">Suivez l'état de vos demandes auprès des recruteurs.</p>
+            </header>
 
+            {isDashboardLoading ? (
+              <div className="flex justify-center py-20"><Spinner size="xl" className="text-coral" /></div>
+            ) : (
+              <div className="space-y-6">
+                {myApplications.length === 0 ? (
+                  <div className="bg-white p-12 rounded-3xl text-center shadow-sm border border-gray-100">
+                    <HiOutlinePaperAirplane className="mx-auto h-16 w-16 text-teal opacity-30 mb-4 rotate-90" />
+                    <h3 className="text-xl font-bold text-navy mb-2">Aucune candidature</h3>
+                    <p className="text-gray-500">Vous n'avez pas encore postulé à des missions.</p>
+                    <button onClick={() => setActiveView("Trouver une mission")} className="mt-6 px-6 py-2.5 bg-coral text-white font-bold rounded-xl shadow-md hover:scale-105 transition-transform">
+                      Explorer les missions
+                    </button>
+                  </div>
+                ) : (
+                  myApplications.map((app) => {
+                    // On retrouve les détails de l'annonce pour afficher le nom de la mission et de l'entreprise
+                    const offer = fullOffersData.find(o => o.id === app.job_offer);
+                    
+                    return (
+                      <div key={app.id} className={`bg-white rounded-3xl p-6 shadow-sm border-l-4 ${app.status === 'ACCEPTED' ? 'border-l-green-400' : app.status === 'REJECTED' ? 'border-l-coral' : 'border-l-yellow-400'}`}>
+                        <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-4 border-b border-gray-100 pb-4">
+                          <div>
+                            <h3 className="text-xl font-black text-navy">{offer ? offer.offer_title : `Annonce N°${app.job_offer} (Supprimée)`}</h3>
+                            {offer && (
+                              <button onClick={() => openCompanyProfile(offer.offer_company)} className="text-teal font-bold hover:underline flex items-center text-sm mt-1">
+                                <HiOfficeBuilding className="mr-1" /> {offer.company_name || "Entreprise confidentielle"}
+                              </button>
+                            )}
+                          </div>
+                          
+                          {/* BADGES DE STATUT */}
+                          <div className="flex-shrink-0">
+                            {app.status === 'ACCEPTED' && <Badge color="success" icon={HiCheckCircle} className="px-4 py-2 text-sm font-bold">Candidature Acceptée !</Badge>}
+                            {app.status === 'REJECTED' && <Badge color="failure" icon={HiXCircle} className="px-4 py-2 text-sm font-bold">Candidature Déclinée</Badge>}
+                            {app.status === 'PENDING' && <Badge color="warning" icon={HiClock} className="px-4 py-2 text-sm font-bold">En attente de réponse</Badge>}
+                          </div>
+                        </div>
+
+                        {/* MESSAGE DU CANDIDAT (RAPPEL) */}
+                        {app.cover_message && (
+                          <div className="mb-4">
+                            <p className="text-xs font-bold text-gray-400 uppercase mb-1">Votre message :</p>
+                            <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg italic">"{app.cover_message}"</p>
+                          </div>
+                        )}
+
+                        {/* MESSAGE DE L'ENTREPRISE (IA) EN CAS DE REFUS */}
+                        {app.status === 'REJECTED' && app.rejection_message && (
+                          <div className="mt-4 bg-coral/5 border border-coral/20 p-4 rounded-xl">
+                            <p className="text-xs font-black text-coral uppercase mb-2 flex items-center">
+                              <HiOutlineMail className="mr-2 h-4 w-4" /> Réponse du recruteur :
+                            </p>
+                            <p className="text-sm text-gray-800 leading-relaxed">{app.rejection_message}</p>
+                          </div>
+                        )}
+                        
+                        {/* PETIT MESSAGE D'ENCOURAGEMENT EN CAS D'ACCEPTATION */}
+                        {app.status === 'ACCEPTED' && (
+                          <div className="mt-4 bg-green-50 border border-green-200 p-4 rounded-xl">
+                            <p className="text-sm text-green-800 font-bold flex items-center">
+                              <HiSparkles className="mr-2 h-5 w-5 text-green-500" /> Félicitations ! L'entreprise va prendre contact avec vous prochainement.
+                            </p>
+                          </div>
+                        )}
+
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            )}
+          </>
+        )}
       </main>
     </div>
   );
