@@ -18,7 +18,7 @@ export default function LoginUser() {
     
     localStorage.setItem("token", data.access);
     navigate("/dashboard");
-  } catch (err) {
+  } catch  {
     setError("Identifiants incorrects ou serveur éteint.");
   }
 };

@@ -53,7 +53,7 @@ export default function FreelanceSkillsForm() {
     try {
       await deleteSkill(id);
       loadSkills(); // On recharge la liste
-    } catch (error) {
+    } catch {
       setMessage({ text: "Impossible de supprimer la compétence.", type: "error" });
     }
   };
