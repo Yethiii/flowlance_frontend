@@ -135,7 +135,9 @@ export default function FreelanceProfileForm() {
       await updateFreelanceProfile(profileId, formData);
       setMessage({ text: "Profil sauvegardé avec succès !", type: "success" });
       setTimeout(() => setMessage({text: "", type:""}), 3000);
-    } catch (error) { setMessage({ text: "Erreur lors de la sauvegarde.", type: "error" }); }
+    } catch (error) { 
+      console.error(error);
+      setMessage({ text: "Erreur lors de la sauvegarde.", type: "error" }); }
   };
 
   const handleCVSubmit = async () => {
@@ -146,7 +148,10 @@ export default function FreelanceProfileForm() {
       setExistingCvUrl(updatedProfile.freelance_cv_file); 
       setMessage({ text: "CV mis à jour avec succès !", type: "success" });
       setTimeout(() => setMessage({text: "", type:""}), 3000);
-    } catch (error) { setMessage({ text: "Erreur lors de l'envoi du CV.", type: "error" }); } 
+    } catch (error) { 
+      console.error(error);
+      setMessage({ text: "Erreur lors de l'envoi du CV.", type: "error" }); 
+    } 
     finally { setCvUploading(false); setCvFile(null); }
   };
 
@@ -157,6 +162,7 @@ export default function FreelanceProfileForm() {
       // On recharge la page : les données seront là, mais le statut is_active sera false
       window.location.reload(); 
     } catch (error) {
+      console.error(error);
       alert("Erreur lors de la suspension de votre compte.");
     }
   };
@@ -170,6 +176,7 @@ export default function FreelanceProfileForm() {
       // On le renvoie violemment à l'accueil
       window.location.href = '/'; 
     } catch (error) {
+      console.error(error);
       alert("Erreur lors de la suppression de votre compte.");
     }
   };

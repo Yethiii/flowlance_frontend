@@ -22,7 +22,7 @@ jobs:
     - name: Configuration de Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '20' # On utilise une version LTS (Long Term Support) récente et stable
+        node-version: '22' # On utilise une version LTS (Long Term Support) récente et stable
         cache: 'npm'       # Met en cache les dépendances pour accélérer les futures exécutions
 
     # C. Installer les dépendances (les bibliothèques de ton package.json)

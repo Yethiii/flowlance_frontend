@@ -17,6 +17,7 @@ export default function FreelanceSkillsForm() {
       const data = await getMySkills();
       setSkills(data);
     } catch (error) {
+      console.error(error);
       setMessage({ text: "Erreur de chargement de vos compétences.", type: "error" });
     } finally {
       setIsLoading(false);
@@ -42,6 +43,7 @@ export default function FreelanceSkillsForm() {
       loadSkills(); // On recharge la liste pour voir la nouveauté
       setMessage({ text: "Compétence ajoutée !", type: "success" });
     } catch (error) {
+      console.error(error);
       setMessage({ text: "Impossible d'ajouter cette compétence.", type: "error" });
     }
   };

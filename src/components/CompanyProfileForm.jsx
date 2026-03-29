@@ -142,7 +142,7 @@ export default function CompanyProfileForm() {
       setMessage({ text: "Profil entreprise sauvegardé avec succès !", type: "success" });
       window.scrollTo(0, 0);
     } catch (error) {
-      setMessage({ text: "Erreur lors de la sauvegarde.", type: "error" });
+      console.error(error);      setMessage({ text: "Erreur lors de la sauvegarde.", type: "error" });
     } finally {
       setIsSaving(false);
     }
@@ -161,6 +161,7 @@ export default function CompanyProfileForm() {
       await deactivateCompanyAccount();
       window.location.reload(); 
     } catch (error) {
+      console.error(error);
       alert("Erreur lors de la suspension.");
     }
   };
@@ -172,6 +173,7 @@ export default function CompanyProfileForm() {
       localStorage.removeItem("token"); 
       window.location.href = '/'; 
     } catch (error) {
+      console.error(error);
       alert("Erreur lors de la suppression.");
     }
   };

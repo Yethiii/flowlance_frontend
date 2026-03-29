@@ -66,6 +66,7 @@ export default function CompanyApplications() {
       const data = await generateRejectionMessageAI(fName, appToReject.job_title, rejectionMessage);
       setRejectionMessage(data.generated_message);
     } catch (error) {
+      console.error(error);
       setRejectError("Impossible de joindre l'IA pour le moment.");
     } finally {
       setIsGeneratingAI(false);
