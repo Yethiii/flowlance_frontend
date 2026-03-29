@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { HiMenu, HiX, HiUserCircle, HiBriefcase, HiSearch, 
   HiLocationMarker, HiStar, HiCurrencyEuro, HiClock, 
-  HiOfficeBuilding, HiOutlinePaperAirplane, HiCheckCircle, HiOutlineChatAlt2,
+  HiOfficeBuilding, HiOutlinePaperAirplane, HiCheckCircle, HiOutlineChatAlt2,HiInformationCircle,
   HiXCircle, HiOutlineMail, HiSparkles } from "react-icons/hi";
 import { Spinner, Modal, Textarea, Alert, Badge } from "flowbite-react";
 
@@ -488,7 +488,7 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
                         {conv.last_message === '__CHAT_CLOSED__' ? '🔒 Conversation clôturée' : conv.last_message}
                       </p>
                     </div>
-                    
+
                     <div className="text-xs font-bold text-gray-400">
                       {new Date(conv.timestamp).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
                     </div>
