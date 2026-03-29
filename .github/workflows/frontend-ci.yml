@@ -27,7 +27,7 @@ jobs:
 
     # C. Installer les dépendances (les bibliothèques de ton package.json)
     - name: Installation des dépendances
-      run: npm ci 
+      run: npm ci --legacy-peer-deps
       # Note : On utilise "npm ci" (Clean Install) plutôt que "npm install" dans un CI/CD. 
       # C'est une commande stricte qui garantit d'installer très exactement les mêmes versions que sur ton ordinateur, sans modifier le fichier package-lock.json.
 
