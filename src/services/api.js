@@ -525,3 +525,40 @@ export const getFreelanceProfileById = async (id) => {
     }
     return await response.json();
 };
+
+// ==========================================
+// --- MESSAGERIE INTERNE (CHAT) ---
+// ==========================================
+
+export const getConversation = async (otherUserId) => {
+    const token = localStorage.getItem("token");
+    const response = await fetch(`${API_URL}/messages/${otherUserId}/`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    });
+    
+    if (!response.ok) {
+        throw new Error("Erreur de chargement des messages");
+    }
+    return await response.json();
+};
+
+export const sendMessage = async (otherUserId, content) => {
+    const token = localStorage.getItem("token");
+    const response = await fetch(`${API_URL}/messages/${otherUserId}/`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ content })
+    });
+    
+    if (!response.ok) {
+        throw new Error("Erreur lors de l'envoi du message");
+    }
+    return await response.json();
+};

@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { HiMenu, HiX, HiUserCircle, HiBriefcase, HiSearch, 
   HiLocationMarker, HiStar, HiCurrencyEuro, HiClock, 
-  HiOfficeBuilding, HiOutlinePaperAirplane, HiCheckCircle, 
+  HiOfficeBuilding, HiOutlinePaperAirplane, HiCheckCircle, HiOutlineChatAlt2,
   HiXCircle, HiOutlineMail, HiSparkles } from "react-icons/hi";
 import { Spinner, Modal, Textarea, Alert, Badge } from "flowbite-react";
 
 import FreelanceProfileForm from "./FreelanceProfileForm"; 
 import FreelanceJobBoard from "./FreelanceJobBoard"; 
 import FreelanceCVCoach from "./FreelanceCVCoach";
+import FreelanceChatModal from "./FreelanceChatModal";
 
 // Import de TOUTES les fonctions nécessaires pour lire l'offre et postuler
 import { getFreelanceDashboardData, getAvailableJobOffers, getCompanyProfileById, applyToJob, getMyApplications } from "../services/api";
@@ -37,6 +38,9 @@ export default function DashboardFreelance() {
   const [applyError, setApplyError] = useState("");
   const [applySuccess, setApplySuccess] = useState(false);
   const [isApplying, setIsApplying] = useState(false);
+
+  const [isChatModalOpen, setIsChatModalOpen] = useState(false);
+  const [selectedCompanyId, setSelectedCompanyId] = useState(null);
 
   // --- CHARGEMENT DES DONNÉES ---
   useEffect(() => {
@@ -314,7 +318,7 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
             )}
           </div>
         </Modal>
-            {/* ================= ONGLET : MES CANDIDATURES ================= */}
+           {/* ================= ONGLET : MES CANDIDATURES ================= */}
         {activeView === "Mes Candidatures" && (
           <>
             <header className="mb-10">
@@ -342,6 +346,7 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
                     
                     return (
                       <div key={app.id} className={`bg-white rounded-3xl p-6 shadow-sm border-l-4 ${app.status === 'ACCEPTED' ? 'border-l-green-400' : app.status === 'REJECTED' ? 'border-l-coral' : 'border-l-yellow-400'}`}>
+                        
                         <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-4 border-b border-gray-100 pb-4">
                           <div>
                             <h3 className="text-xl font-black text-navy">{offer ? offer.offer_title : `Annonce N°${app.job_offer} (Supprimée)`}</h3>
@@ -378,12 +383,25 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
                           </div>
                         )}
                         
-                        {/* PETIT MESSAGE D'ENCOURAGEMENT EN CAS D'ACCEPTATION */}
+                        {/* ======================================================== */}
+                        {/* LE NOUVEAU BLOC ACCEPTÉ AVEC LE BOUTON MESSAGERIE        */}
+                        {/* ======================================================== */}
                         {app.status === 'ACCEPTED' && (
-                          <div className="mt-4 bg-green-50 border border-green-200 p-4 rounded-xl">
+                          <div className="mt-4 bg-green-50 border border-green-200 p-4 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <p className="text-sm text-green-800 font-bold flex items-center">
-                              <HiSparkles className="mr-2 h-5 w-5 text-green-500" /> Félicitations ! L'entreprise va prendre contact avec vous prochainement.
+                              <HiSparkles className="mr-2 h-5 w-5 text-green-500" /> Félicitations ! Vous pouvez maintenant discuter avec le recruteur.
                             </p>
+                            <button 
+                              onClick={() => {
+                                if (offer && offer.offer_company) {
+                                  setSelectedCompanyId(offer.offer_company);
+                                  setIsChatModalOpen(true);
+                                }
+                              }}
+                              className="px-4 py-2 bg-teal text-white text-sm font-bold rounded-lg shadow hover:scale-105 transition-transform flex items-center justify-center whitespace-nowrap"
+                            >
+                              <HiOutlineChatAlt2 className="mr-2 h-5 w-5" /> Ouvrir la messagerie
+                            </button>
                           </div>
                         )}
 
@@ -396,6 +414,14 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
           </>
         )}
       </main>
+
+      {/* LA MODALE EST PLACÉE ICI, À L'EXTÉRIEUR DU MAIN POUR S'AFFICHER PAR DESSUS TOUT */}
+      <FreelanceChatModal 
+        show={isChatModalOpen} 
+        onClose={() => setIsChatModalOpen(false)} 
+        companyProfileId={selectedCompanyId} 
+      />
+      
     </div>
   );
 }

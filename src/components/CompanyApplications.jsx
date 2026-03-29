@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { HiUser, HiBriefcase, HiOutlineMail, HiCheckCircle, HiXCircle, HiClock, HiSparkles } from "react-icons/hi";
+import { HiUser, HiBriefcase, HiOutlineMail, HiCheckCircle, HiXCircle, HiClock, HiSparkles, HiOutlineChatAlt2 } from "react-icons/hi";
 import { Spinner, Badge, Card, Modal, Textarea, Alert } from "flowbite-react";
 import { getCompanyApplications, updateApplicationStatus, generateRejectionMessageAI } from "../services/api";
 import FreelanceProfileModal from "./FreelanceProfileModal";
+import MessageModal from "./MessageModal";
 
 export default function CompanyApplications() {
   const [applications, setApplications] = useState([]);
@@ -17,6 +18,9 @@ export default function CompanyApplications() {
   const [rejectionMessage, setRejectionMessage] = useState("");
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [rejectError, setRejectError] = useState("");
+
+  const [isChatModalOpen, setIsChatModalOpen] = useState(false);
+  const [chatFreelanceId, setChatFreelanceId] = useState(null);
 
   useEffect(() => {
     loadApplications();
@@ -151,6 +155,19 @@ export default function CompanyApplications() {
                       </button>
                     </div>
                   )}
+                  {app.status === 'ACCEPTED' && (
+                    <div className="flex gap-3 justify-end mt-auto pt-4 border-t border-gray-100">
+                      <button 
+                        onClick={() => {
+                          setChatFreelanceId(app.freelance.id);
+                          setIsChatModalOpen(true);
+                        }} 
+                        className="px-5 py-2.5 rounded-xl font-bold text-white bg-teal shadow-md transition-transform hover:scale-105 text-sm flex items-center"
+                      >
+                        <HiOutlineChatAlt2 className="mr-2 h-5 w-5" /> Discuter avec le candidat
+                      </button>
+                    </div>
+                  )}
 
                   {/* Affichage du message de refus si la candidature a été rejetée */}
                   {app.status === 'REJECTED' && app.rejection_message && (
@@ -209,6 +226,11 @@ export default function CompanyApplications() {
       </Modal>
 
       <FreelanceProfileModal show={isCandidateModalOpen} onClose={() => setIsCandidateModalOpen(false)} freelanceId={selectedCandidateId} />
+      <MessageModal 
+        show={isChatModalOpen} 
+        onClose={() => setIsChatModalOpen(false)} 
+        freelanceProfileId={chatFreelanceId} 
+      />
     </div>
   );
 }
