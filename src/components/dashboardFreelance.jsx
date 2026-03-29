@@ -10,9 +10,10 @@ import FreelanceProfileForm from "./FreelanceProfileForm";
 import FreelanceJobBoard from "./FreelanceJobBoard"; 
 import FreelanceCVCoach from "./FreelanceCVCoach";
 import FreelanceChatModal from "./FreelanceChatModal";
+import DirectChatModal from "./DirectChatModal";
 
 // Import de TOUTES les fonctions nécessaires pour lire l'offre et postuler
-import { getFreelanceDashboardData, getAvailableJobOffers, getCompanyProfileById, applyToJob, getMyApplications } from "../services/api";
+import { getFreelanceDashboardData, getAvailableJobOffers, getCompanyProfileById, applyToJob, getMyApplications,getNotificationsCount, getConversationsList } from "../services/api";
 
 export default function DashboardFreelance() {
   const navigate = useNavigate();
@@ -41,6 +42,36 @@ export default function DashboardFreelance() {
 
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
   const [selectedCompanyId, setSelectedCompanyId] = useState(null);
+
+  // --- ÉTATS POUR LA MESSAGERIE ---
+  const [notifs, setNotifs] = useState({ unread_messages: 0, pending_applications: 0 });
+  const [conversations, setConversations] = useState([]);
+  const [directChatUser, setDirectChatUser] = useState(null);
+  const [directChatName, setDirectChatName] = useState("");
+  const [isDirectChatOpen, setIsDirectChatOpen] = useState(false);
+
+  // --- LE MOTEUR TEMPS RÉEL (SHORT POLLING) ---
+  useEffect(() => {
+    const fetchRealTimeData = async () => {
+      try {
+        // 1. On récupère le nombre de notifications générales (la petite pastille rouge)
+        const notifData = await getNotificationsCount();
+        setNotifs(notifData);
+
+        // 2. Si l'utilisateur est sur l'onglet Messagerie, on rafraîchit la liste des conversations !
+        if (activeView === "Messagerie") {
+          const convos = await getConversationsList();
+          setConversations(convos);
+        }
+      } catch (error) { console.error("Erreur Temps Réel", error); }
+    };
+
+    fetchRealTimeData(); // Appel immédiat au chargement
+    const interval = setInterval(fetchRealTimeData, 3000); // Rafraîchit toutes les 3 secondes !
+    return () => clearInterval(interval);
+  }, [activeView]);
+
+
 
   // --- CHARGEMENT DES DONNÉES ---
   useEffect(() => {
@@ -118,7 +149,8 @@ export default function DashboardFreelance() {
     finally { setIsLoadingCompany(false); }
   };
 
-const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures", "Mon CV (IA)", "Mon Profil"];
+const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures", "Mon CV (IA)", "Mon Profil", "Messagerie"];
+
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-teal/5">
       {/* ... (HEADER ET SIDEBAR IDENTIQUES) ... */}
@@ -136,8 +168,12 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
         <nav className="flex-1 space-y-2">
           {menuItems.map((item) => (
             <button key={item} onClick={() => { setActiveView(item); setIsMenuOpen(false); }}
-              className={`w-full text-left p-4 rounded-xl transition-colors font-bold ${activeView === item ? "bg-white/10 text-coral" : "text-sage hover:bg-white/5"}`}>
-              {item}
+              className={`w-full text-left p-4 rounded-xl transition-colors font-bold flex justify-between items-center ${activeView === item ? "bg-white/10 text-coral" : "text-sage hover:bg-white/5"}`}>
+              <span>{item}</span>
+              {/* LA FAMEUSE PASTILLE ROUGE SI MESSAGE NON LU ! */}
+              {item === "Messagerie" && notifs.unread_messages > 0 && (
+                <Badge color="failure" className="w-6 h-6 flex items-center justify-center rounded-full p-0 shadow-sm animate-pulse">{notifs.unread_messages}</Badge>
+              )}
             </button>
           ))}
         </nav>
@@ -413,6 +449,56 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
             )}
           </>
         )}
+
+        {/* ================= ONGLET : MESSAGERIE ================= */}
+        {activeView === "Messagerie" && (
+          <>
+            <header className="mb-10">
+              <h1 className="text-2xl md:text-4xl font-black text-navy uppercase tracking-tight">Messagerie</h1>
+              <p className="text-teal font-medium mt-2">Vos discussions en temps réel avec les recruteurs.</p>
+            </header>
+            
+            {conversations.length === 0 ? (
+              <div className="bg-white p-12 rounded-3xl text-center shadow-sm border border-gray-100">
+                <HiOutlineChatAlt2 className="mx-auto h-16 w-16 text-teal opacity-30 mb-4" />
+                <h3 className="text-xl font-bold text-navy mb-2">Aucune conversation</h3>
+                <p className="text-gray-500">Attendez qu'un recruteur valide votre profil pour démarrer le chat.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {conversations.map((conv) => (
+                  <div key={conv.other_user_id} 
+                    onClick={() => {
+                      setDirectChatUser(conv.other_user_id);
+                      setDirectChatName(conv.name);
+                      setIsDirectChatOpen(true);
+                    }}
+                    className={`bg-white p-6 rounded-2xl shadow-sm border-l-4 cursor-pointer hover:shadow-md transition-all flex items-center justify-between ${conv.unread_count > 0 ? 'border-l-coral bg-coral/5' : 'border-l-transparent'}`}>
+                    <div className="flex flex-col">
+                      <h4 className="font-bold text-navy text-lg flex items-center">
+                        {conv.name}
+                        {conv.unread_count > 0 && <Badge color="failure" className="ml-3 animate-pulse">Nouveau</Badge>}
+                      </h4>
+                      {/* LE TITRE DE LA MISSION */}
+                      <span className="text-xs font-bold text-teal bg-teal/5 px-2 py-1 rounded-md w-max mt-1 mb-1">
+                        🏷️ Mission : {conv.job_title}
+                      </span>
+                      {/* LE DERNIER MESSAGE */}
+                      <p className={`text-sm truncate max-w-md ${conv.unread_count > 0 ? 'text-navy font-bold' : 'text-gray-500'}`}>
+                        {conv.last_message === '__CHAT_CLOSED__' ? '🔒 Conversation clôturée' : conv.last_message}
+                      </p>
+                    </div>
+                    
+                    <div className="text-xs font-bold text-gray-400">
+                      {new Date(conv.timestamp).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
       </main>
 
       {/* LA MODALE EST PLACÉE ICI, À L'EXTÉRIEUR DU MAIN POUR S'AFFICHER PAR DESSUS TOUT */}
@@ -420,6 +506,13 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
         show={isChatModalOpen} 
         onClose={() => setIsChatModalOpen(false)} 
         companyProfileId={selectedCompanyId} 
+      />
+
+      <DirectChatModal 
+        show={isDirectChatOpen} 
+        onClose={() => setIsDirectChatOpen(false)} 
+        targetUserId={directChatUser}
+        targetName={directChatName}
       />
       
     </div>

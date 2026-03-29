@@ -562,3 +562,31 @@ export const sendMessage = async (otherUserId, content) => {
     }
     return await response.json();
 };
+
+export const getNotificationsCount = async () => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/notifications/`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Erreur notifications");
+    return await res.json();
+};
+
+export const getConversationsList = async () => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/conversations/`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Erreur conversations");
+    return await res.json();
+};
+
+export const deleteConversation = async (otherUserId) => {
+    const token = localStorage.getItem("token");
+    const response = await fetch(`${API_URL}/messages/${otherUserId}/`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error("Erreur de suppression");
+    return true;
+};

@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { HiMenu, HiX, HiUserCircle, HiBriefcase, HiOutlineChatAlt2, HiUser, HiCog} from "react-icons/hi";
-import { Spinner, Modal } from "flowbite-react";
+import { Spinner, Modal, Badge } from "flowbite-react";
 import CompanyApplications from "./CompanyApplications";
 import CompanyProfileForm from "./CompanyProfileForm"; 
 import CompanyJobOffers from "./CompanyJobOffers";
-import { getCompanyDashboardData } from "../services/api";
+import { getCompanyDashboardData, getNotificationsCount, getConversationsList} from "../services/api";
 import FreelanceProfileModal from "./FreelanceProfileModal";
+import DirectChatModal from "./DirectChatModal";
 
 export default function DashboardCompany() {
   const navigate = useNavigate();
@@ -20,7 +21,15 @@ export default function DashboardCompany() {
   const [isCandidateModalOpen, setIsCandidateModalOpen] = useState(false);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [selectedFreelanceId, setSelectedFreelanceId] = useState(null);
+  const [notifs, setNotifs] = useState({ unread_messages: 0, pending_applications: 0 });
+  const [conversations, setConversations] = useState([]);
+  const [directChatUser, setDirectChatUser] = useState(null);
+  const [directChatName, setDirectChatName] = useState("");
+  const [isDirectChatOpen, setIsDirectChatOpen] = useState(false);
 
+  // ==========================================
+  // 1. CHARGEMENT DU TABLEAU DE BORD (IA)
+  // ==========================================
   useEffect(() => {
     if (activeView === "Tableau de bord") {
       const fetchMatches = async () => {
@@ -40,12 +49,36 @@ export default function DashboardCompany() {
     }
   }, [activeView]);
 
+  // ==========================================
+  // 2. MOTEUR TEMPS RÉEL POUR LA MESSAGERIE
+  // ==========================================
+  useEffect(() => {
+    const fetchRealTimeData = async () => {
+      try {
+        // 1. On récupère les pastilles rouges (messages ET nouvelles candidatures)
+        const notifData = await getNotificationsCount();
+        setNotifs(notifData);
+
+        // 2. Si on est sur l'onglet Messagerie, on rafraîchit la liste
+        if (activeView === "Messagerie") {
+          const convos = await getConversationsList();
+          setConversations(convos);
+        }
+      } catch (error) { console.error("Erreur Temps Réel", error); }
+    };
+
+    fetchRealTimeData(); // Premier appel immédiat
+    const interval = setInterval(fetchRealTimeData, 3000); // Rafraîchit toutes les 3 secondes
+    return () => clearInterval(interval);
+  }, [activeView]);
+  
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");
   };
 
-  const menuItems = ["Tableau de bord", "Mes Annonces", "Candidatures", "Mon Entreprise"];
+  const menuItems = ["Tableau de bord", "Mes Annonces", "Candidatures", "Mon Entreprise", "Messagerie"];
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-teal/5">
@@ -64,8 +97,18 @@ export default function DashboardCompany() {
         <nav className="flex-1 space-y-2">
           {menuItems.map((item) => (
             <button key={item} onClick={() => { setActiveView(item); setIsMenuOpen(false); }}
-              className={`w-full text-left p-4 rounded-xl transition-colors font-bold ${activeView === item ? "bg-white/10 text-coral" : "text-sage hover:bg-white/5"}`}>
-              {item}
+              className={`w-full text-left p-4 rounded-xl transition-colors font-bold flex justify-between items-center ${activeView === item ? "bg-white/10 text-teal" : "text-gray-400 hover:bg-white/5"}`}>
+              <span>{item}</span>
+              
+              {/* PASTILLE ROUGE : NOUVEAUX MESSAGES */}
+              {item === "Messagerie" && notifs.unread_messages > 0 && (
+                <Badge color="failure" className="w-6 h-6 flex items-center justify-center rounded-full p-0 shadow-sm animate-pulse">{notifs.unread_messages}</Badge>
+              )}
+              
+              {/* PASTILLE JAUNE/ORANGE : NOUVELLES CANDIDATURES EN ATTENTE */}
+              {item === "Candidatures" && notifs.pending_applications > 0 && (
+                <Badge color="warning" className="w-6 h-6 flex items-center justify-center rounded-full p-0 shadow-sm animate-pulse">{notifs.pending_applications}</Badge>
+              )}
             </button>
           ))}
         </nav>
@@ -143,6 +186,53 @@ export default function DashboardCompany() {
             )}
           </>
         )}
+        {/* ================= ONGLET : MESSAGERIE ================= */}
+        {activeView === "Messagerie" && (
+          <>
+            <header className="mb-10">
+              <h1 className="text-2xl md:text-4xl font-black text-navy uppercase tracking-tight">Messagerie</h1>
+              <p className="text-teal font-medium mt-2">Vos discussions en temps réel avec les candidats.</p>
+            </header>
+            
+            {conversations.length === 0 ? (
+              <div className="bg-white p-12 rounded-3xl text-center shadow-sm border border-gray-100">
+                <HiOutlineChatAlt2 className="mx-auto h-16 w-16 text-teal opacity-30 mb-4" />
+                <h3 className="text-xl font-bold text-navy mb-2">Aucune conversation</h3>
+                <p className="text-gray-500">Acceptez un candidat pour démarrer une discussion avec lui.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {conversations.map((conv) => (
+                  <div key={conv.other_user_id} 
+                    onClick={() => {
+                      setDirectChatUser(conv.other_user_id);
+                      setDirectChatName(conv.name);
+                      setIsDirectChatOpen(true);
+                    }}
+                    className={`bg-white p-6 rounded-2xl shadow-sm border-l-4 cursor-pointer hover:shadow-md transition-all flex items-center justify-between ${conv.unread_count > 0 ? 'border-l-coral bg-coral/5' : 'border-l-transparent'}`}>
+                    <div className="flex flex-col">
+                      <h4 className="font-bold text-navy text-lg flex items-center">
+                        {conv.name}
+                        {conv.unread_count > 0 && <Badge color="failure" className="ml-3 animate-pulse">Nouveau</Badge>}
+                      </h4>
+                      {/* LE TITRE DE LA MISSION */}
+                      <span className="text-xs font-bold text-teal bg-teal/5 px-2 py-1 rounded-md w-max mt-1 mb-1">
+                        🏷️ Mission : {conv.job_title}
+                      </span>
+                      {/* LE DERNIER MESSAGE */}
+                      <p className={`text-sm truncate max-w-md ${conv.unread_count > 0 ? 'text-navy font-bold' : 'text-gray-500'}`}>
+                        {conv.last_message === '__CHAT_CLOSED__' ? '🔒 Conversation clôturée' : conv.last_message}
+                      </p>
+                    </div>
+                    <div className="text-xs font-bold text-gray-400">
+                      {new Date(conv.timestamp).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
 
         
       </main>
@@ -163,6 +253,12 @@ export default function DashboardCompany() {
         </div>
       </Modal>
 
+        <DirectChatModal 
+        show={isDirectChatOpen} 
+        onClose={() => setIsDirectChatOpen(false)} 
+        targetUserId={directChatUser}
+        targetName={directChatName}
+      />
 
     </div>
   );
