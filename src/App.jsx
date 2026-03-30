@@ -7,6 +7,8 @@ import CookieBanner from "./components/CookieBanner";
 import AppFooter from "./components/AppFooter";
 
 function App() {
+  console.log("Test Login :", Login);
+  console.log("Test Register :", Register);
   console.log("Test Footer :", AppFooter);
   console.log("Test Bannière :", CookieBanner);
   console.log("Test Mentions :", MentionsLegales);
