@@ -4,7 +4,7 @@ import Register from "./components/register";
 import Dashboard from "./components/dashboard";
 import MentionsLegales from "./components/MentionsLegales";
 import CookieBanner from "./components/CookieBanner";
-import AppFooter from "./components/AppFooter";
+import Footer from "./components/AppFooter";
 
 function App() {
   return (
@@ -23,7 +23,7 @@ function App() {
           </Routes>
         </main>
 
-        <AppFooter />
+        <Footer />
 
         <CookieBanner />
 
