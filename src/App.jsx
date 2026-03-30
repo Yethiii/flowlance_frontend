@@ -7,31 +7,28 @@ import CookieBanner from "./components/CookieBanner";
 import AppFooter from "./components/AppFooter";
 
 function App() {
-
   return (
-
     <Router>
+      <div className="flex flex-col min-h-screen">
+        
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/dashboard" element={<Dashboard />} /> 
+            
+            {/* 1. ON TESTE JUSTE LA ROUTE LÉGALE */}
+            <Route path="/legal" element={<MentionsLegales />} />
 
-      <Routes>
+            <Route path="*" element={<Navigate to="/login" />} />
+          </Routes>
+        </main>
 
-        <Route path="/login" element={<Login />} />
+        {/* ON NE MET PAS ENCORE LE FOOTER NI LA BANNIÈRE */}
 
-        <Route path="/register" element={<Register />} />
-
-        <Route path="/dashboard" element={<Dashboard />} />
-
-
-
-        <Route path="*" element={<Navigate to="/login" />} />
-
-      </Routes>
-
+      </div>
     </Router>
-
   );
-
 }
-
-
 
 export default App;
