@@ -23,11 +23,9 @@ function App() {
           </Routes>
         </main>
 
-        {/* 2. ON TESTE LE FOOTER */}
         <AppFooter />
 
-        {/* ON GARDE LA BANNIÈRE DÉSACTIVÉE POUR CE TEST */}
-        {/* <CookieBanner /> */}
+        <CookieBanner />
 
       </div>
     </Router>
