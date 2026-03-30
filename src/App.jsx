@@ -17,14 +17,17 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/dashboard" element={<Dashboard />} /> 
             
-            {/* 1. ON TESTE JUSTE LA ROUTE LÉGALE */}
             <Route path="/legal" element={<MentionsLegales />} />
 
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
         </main>
 
-        {/* ON NE MET PAS ENCORE LE FOOTER NI LA BANNIÈRE */}
+        {/* 2. ON TESTE LE FOOTER */}
+        <AppFooter />
+
+        {/* ON GARDE LA BANNIÈRE DÉSACTIVÉE POUR CE TEST */}
+        {/* <CookieBanner /> */}
 
       </div>
     </Router>
