@@ -1,21 +1,23 @@
-import { Footer } from "flowbite-react";
 import { Link } from "react-router-dom";
 
 export default function AppFooter() {
   return (
-    <Footer container className="rounded-none shadow-none border-t bg-gray-50 dark:bg-gray-900">
-      <div className="w-full text-center sm:flex sm:items-center sm:justify-between">
-        <Footer.Copyright href="/" by="Flowlance™" year={new Date().getFullYear()} />
-        <Footer.LinkGroup className="mt-3 flex-wrap items-center justify-center sm:mt-0">
-          {/* On utilise Link de react-router-dom pour éviter le rechargement de la page */}
-          <Link to="/legal" className="mr-4 hover:underline md:mr-6 text-sm text-gray-500 dark:text-gray-400">
+    <footer className="w-full p-4 bg-gray-50 border-t border-gray-200 shadow md:flex md:items-center md:justify-between md:p-6 dark:bg-gray-900 dark:border-gray-700">
+      <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">
+        © {new Date().getFullYear()} <Link to="/" className="hover:underline font-semibold">Flowlance™</Link>.
+      </span>
+      <ul className="flex flex-wrap items-center mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0 gap-4 md:gap-6">
+        <li>
+          <Link to="/legal" className="hover:underline">
             Mentions Légales & Confidentialité
           </Link>
-          <a href="mailto:contact@flowlance.com" className="hover:underline text-sm text-gray-500 dark:text-gray-400">
+        </li>
+        <li>
+          <a href="mailto:contact@flowlance.com" className="hover:underline">
             Contact
           </a>
-        </Footer.LinkGroup>
-      </div>
-    </Footer>
+        </li>
+      </ul>
+    </footer>
   );
 }
