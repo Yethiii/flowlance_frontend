@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { HiCheckCircle } from "react-icons/hi";
 
 export default function CookieBanner() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // On vérifie si l'utilisateur a déjà fermé le bandeau
     const bannerDismissed = localStorage.getItem("flowlance_banner_dismissed");
     if (!bannerDismissed) {
       setIsVisible(true);
@@ -20,27 +20,35 @@ export default function CookieBanner() {
   if (!isVisible) return null;
 
   return (
-    // Bannière gris très foncé pour le contraste
-    <div className="fixed bottom-0 left-0 w-full bg-gray-900 text-white p-4 shadow-xl z-50 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-700">
-      <div className="text-sm text-center sm:text-left text-gray-100">
+    // Bandeau fixe reprenant le style de ta barre de sauvegarde (ombre portée vers le haut)
+    <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] p-4 z-50 flex flex-col md:flex-row items-center justify-between gap-4">
+      
+      <div className="text-sm text-center md:text-left text-navy">
         <p>
-          <strong>Votre vie privée compte.</strong> Flowlance utilise uniquement des cookies techniques (stockage local) nécessaires à votre connexion. Nous ne vous traçons pas.
+          <strong className="font-black text-coral uppercase tracking-wide">Votre vie privée compte.</strong><br/>
+          Flowlance utilise uniquement des cookies techniques strictement nécessaires à votre connexion.
         </p>
       </div>
-      <div className="flex gap-4 whitespace-nowrap items-center">
-        {/* Lien : Teal clair pour ressortir sur le gris foncé */}
-        <Link to="/legal" className="text-sm text-teal-300 underline hover:text-teal-200 flex items-center">
-          En savoir plus
+      
+      <div className="flex flex-col sm:flex-row items-center gap-4 whitespace-nowrap w-full md:w-auto">
+        <Link 
+          to="/legal" 
+          className="text-sm font-bold text-gray-500 hover:text-navy underline transition-colors"
+        >
+          Mentions Légales
         </Link>
         
-        {/* BOUTON CORRIGÉ : Fond Teal foncé pour ton thème, texte Blanc pour le contraste */}
+        {/* BOUTON : Exactement le même style "Coral" que tes boutons de validation */}
         <button 
           onClick={handleDismiss}
-          className="bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold py-2 px-4 rounded shadow transition-colors"
+          className="w-full sm:w-auto px-6 py-2.5 text-white font-black rounded-xl hover:scale-105 transition-transform shadow-md flex items-center justify-center gap-2"
+          style={{ backgroundColor: '#CE6A6B' }}
         >
-          J'ai compris
+          <HiCheckCircle className="text-lg" />
+          J'AI COMPRIS
         </button>
       </div>
+      
     </div>
   );
 }

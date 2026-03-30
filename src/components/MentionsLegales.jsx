@@ -1,57 +1,82 @@
 import { Card } from "flowbite-react";
+import { Link } from "react-router-dom";
+import { HiHome, HiX } from "react-icons/hi";
 
 export default function MentionsLegales() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50 dark:bg-gray-900">
-      <Card className="max-w-4xl w-full border-none shadow-xl p-8 bg-white dark:bg-gray-800">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50 pb-20">
+      
+      <Card className="max-w-4xl w-full border-none shadow-2xl bg-white rounded-3xl overflow-hidden p-0">
         
-        {/* Titre principal : Teal foncé pour ton thème */}
-        <h1 className="text-3xl font-black mb-6 text-teal-800 dark:text-white border-b border-teal-100 dark:border-gray-700 pb-4">
-          Mentions Légales & Politique de Confidentialité
-        </h1>
-
-        {/* Div parente forcée en Gris très foncé/Noir pour la lisibilité sur fond blanc */}
-        <div className="space-y-6 text-gray-900 dark:text-gray-100">
+        {/* EN-TÊTE : Style Navy identique à ton Profil */}
+        <div className="flex items-center justify-between p-6 bg-navy text-white">
+          <span className="text-2xl font-black italic">
+            MENTIONS LÉGALES
+          </span>
           
-          <section>
-            {/* Sous-titre : Teal foncé */}
-            <h2 className="text-xl font-bold text-teal-700 dark:text-white mb-2">1. Édition du site</h2>
-            <p className="leading-relaxed">
+          <div className="flex items-center gap-3">
+            <Link 
+              to="/" 
+              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+              title="Retour à l'accueil"
+            >
+              <HiHome className="w-5 h-5" />
+            </Link>
+            <Link 
+              to="/" 
+              className="p-2 rounded-full bg-coral/80 hover:bg-coral text-white shadow-md transition-colors"
+              title="Fermer"
+            >
+              <HiX className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+
+        {/* CONTENU PRINCIPAL */}
+        <div className="p-6 md:p-8 space-y-8">
+          
+          {/* Bloc type "Profil" avec fond gris clair */}
+          <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+            <h3 className="text-lg font-black text-navy mb-4 border-b pb-2">1. Édition du site</h3>
+            <p className="leading-relaxed text-gray-700">
               Le site <strong>Flowlance</strong> est un projet académique à but non lucratif développé dans le cadre de ma formation en Informatique.
             </p>
-            <ul className="list-disc pl-5 mt-2 space-y-1">
+            <ul className="list-disc pl-5 mt-3 space-y-1 text-gray-700">
               <li><strong>Créatrice et Développeuse :</strong> Laetitia Voué</li>
               <li><strong>Hébergement Frontend :</strong> Vercel Inc.</li>
               <li><strong>Hébergement Backend :</strong> Render</li>
             </ul>
-          </section>
+          </div>
 
-          <section>
-            <h2 className="text-xl font-bold text-teal-700 dark:text-white mb-2">2. Données Personnelles (RGPD)</h2>
-            <p className="leading-relaxed mb-2">
-              Les données collectées lors de votre inscription (adresse email, informations professionnelles, CV au format PDF) sont utilisées <strong>exclusivement</strong> dans le cadre du fonctionnement de la plateforme (mise en relation et analyse par nos services d'Intelligence Artificielle).
+          <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+            <h3 className="text-lg font-black text-navy mb-4 border-b pb-2">2. Données Personnelles (RGPD)</h3>
+            <div className="mb-4 p-4 bg-sage/10 rounded-xl border border-sage/30">
+              <span className="text-sm font-bold text-navy">
+                Les données collectées lors de votre inscription sont utilisées exclusivement dans le cadre du fonctionnement de la plateforme (mise en relation et analyse IA).
+              </span>
+            </div>
+            <p className="leading-relaxed text-gray-700">
+              Elles ne sont en aucun cas vendues ou utilisées à des fins commerciales. Conformément au RGPD, vous possédez un contrôle total sur vos données depuis les paramètres de votre compte (suspension et suppression définitive).
             </p>
-            <p className="leading-relaxed">
-              Elles ne sont en aucun cas vendues, cédées à des tiers, ou utilisées à des fins de prospection commerciale. Conformément au Règlement Général sur la Protection des Données (RGPD), tout utilisateur possède un contrôle total sur ses données depuis les paramètres de son compte, incluant le droit de suspension et de suppression définitive de son profil et de ses fichiers.
-            </p>
-          </section>
+          </div>
 
-          <section>
-            <h2 className="text-xl font-bold text-teal-700 dark:text-white mb-2">3. Politique des Cookies et Stockage Local</h2>
-            <p className="leading-relaxed mb-2">
-              Flowlance fait le choix de la protection de votre vie privée. <strong>Aucun cookie de traçage publicitaire ou outil analytique (comme Google Analytics) n'est utilisé sur cette plateforme.</strong>
+          <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+            <h3 className="text-lg font-black text-navy mb-4 border-b pb-2">3. Politique des Cookies</h3>
+            <p className="leading-relaxed text-gray-700 mb-2">
+              <strong>Aucun cookie de traçage publicitaire n'est utilisé.</strong>
             </p>
-            <p className="leading-relaxed">
-              Pour maintenir votre session active et sécuriser vos accès de manière transparente, l'application utilise exclusivement le stockage local de votre navigateur (<code>localStorage</code>) pour conserver un jeton d'authentification crypté (Token JWT). Ce fonctionnement, purement technique et strictement nécessaire à la fourniture du service, ne nécessite aucun recueil de consentement préalable.
+            <p className="leading-relaxed text-gray-700">
+              L'application utilise exclusivement le stockage local (<code>localStorage</code>) pour conserver un jeton d'authentification crypté (Token JWT) indispensable à votre connexion sécurisée.
             </p>
-          </section>
+          </div>
 
-          <section>
-            <h2 className="text-xl font-bold text-teal-700 dark:text-white mb-2">4. Propriété Intellectuelle</h2>
-            <p className="leading-relaxed">
-              L'ensemble des éléments figurant sur Flowlance (architecture logicielle, design, logotype) sont la propriété de son autrice, à l'exception des bibliothèques open-source utilisées sous leurs licences respectives.
+          <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+            <h3 className="text-lg font-black text-navy mb-4 border-b pb-2">4. Propriété Intellectuelle</h3>
+            <p className="leading-relaxed text-gray-700">
+              L'ensemble des éléments figurant sur Flowlance sont la propriété de son autrice, à l'exception des bibliothèques open-source utilisées sous leurs licences respectives.
             </p>
-          </section>
+          </div>
+
         </div>
       </Card>
     </div>
