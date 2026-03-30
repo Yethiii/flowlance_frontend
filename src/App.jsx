@@ -7,6 +7,11 @@ import CookieBanner from "./components/CookieBanner";
 import AppFooter from "./components/Footer";
 
 function App() {
+  console.log("Test Footer :", AppFooter);
+  console.log("Test Bannière :", CookieBanner);
+  console.log("Test Mentions :", MentionsLegales);
+  console.log("Test Dashboard :", Dashboard);
+  
   return (
     <Router>
       <div className="flex flex-col min-h-screen">
