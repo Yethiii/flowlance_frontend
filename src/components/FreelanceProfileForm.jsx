@@ -94,12 +94,14 @@ export default function FreelanceProfileForm() {
           if (profile.certifications) setCertifications(profile.certifications);
           if (profile.licenses) setLicenses(profile.licenses);
           if (profile.freelance_cv_file) setExistingCvUrl(profile.freelance_cv_file);
+          
+          setSkills(skillList);
+          setSectors(sectorList);
+          setAvailableSoftSkills(softList);
+          setFirstName(profile.first_name || "");
+          setLastName(profile.last_name || "");
         }
-        setSkills(skillList);
-        setSectors(sectorList);
-        setAvailableSoftSkills(softList);
-        setFirstName(profile.first_name || "");
-        setLastName(profile.last_name || "");
+        
       } catch (err) { console.error(err); } 
       finally { setIsLoading(false); }
     };
