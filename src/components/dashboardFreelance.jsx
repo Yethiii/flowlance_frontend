@@ -12,7 +12,6 @@ import FreelanceCVCoach from "./FreelanceCVCoach";
 import FreelanceChatModal from "./FreelanceChatModal";
 import DirectChatModal from "./DirectChatModal";
 
-// Import de TOUTES les fonctions nécessaires pour lire l'offre et postuler
 import { getFreelanceDashboardData, getAvailableJobOffers, getCompanyProfileById, applyToJob, getMyApplications,getNotificationsCount, getConversationsList } from "../services/api";
 
 export default function DashboardFreelance() {
@@ -20,13 +19,11 @@ export default function DashboardFreelance() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeView, setActiveView] = useState("Tableau de bord");
 
-  // --- ÉTATS POUR L'IA ET LES OFFRES COMPLÈTES ---
   const [aiMatches, setAiMatches] = useState([]);
   const [fullOffersData, setFullOffersData] = useState([]);
   const [myApplications, setMyApplications] = useState([]);
   const [isDashboardLoading, setIsDashboardLoading] = useState(false);
 
-  // --- ÉTATS POUR LES MODALES (Copie de FreelanceJobBoard) ---
   const [viewedOffer, setViewedOffer] = useState(null);
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
   const [viewedCompany, setViewedCompany] = useState(null);
@@ -43,22 +40,18 @@ export default function DashboardFreelance() {
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
   const [selectedCompanyId, setSelectedCompanyId] = useState(null);
 
-  // --- ÉTATS POUR LA MESSAGERIE ---
   const [notifs, setNotifs] = useState({ unread_messages: 0, pending_applications: 0 });
   const [conversations, setConversations] = useState([]);
   const [directChatUser, setDirectChatUser] = useState(null);
   const [directChatName, setDirectChatName] = useState("");
   const [isDirectChatOpen, setIsDirectChatOpen] = useState(false);
 
-  // --- LE MOTEUR TEMPS RÉEL (SHORT POLLING) ---
   useEffect(() => {
     const fetchRealTimeData = async () => {
       try {
-        // 1. On récupère le nombre de notifications générales (la petite pastille rouge)
         const notifData = await getNotificationsCount();
         setNotifs(notifData);
 
-        // 2. Si l'utilisateur est sur l'onglet Messagerie, on rafraîchit la liste des conversations !
         if (activeView === "Messagerie") {
           const convos = await getConversationsList();
           setConversations(convos);
@@ -66,20 +59,18 @@ export default function DashboardFreelance() {
       } catch (error) { console.error("Erreur Temps Réel", error); }
     };
 
-    fetchRealTimeData(); // Appel immédiat au chargement
-    const interval = setInterval(fetchRealTimeData, 3000); // Rafraîchit toutes les 3 secondes !
+    fetchRealTimeData(); 
+    const interval = setInterval(fetchRealTimeData, 3000); 
     return () => clearInterval(interval);
   }, [activeView]);
 
 
 
-  // --- CHARGEMENT DES DONNÉES ---
   useEffect(() => {
     if (activeView === "Tableau de bord") {
       const fetchDashboardData = async () => {
         setIsDashboardLoading(true);
         try {
-          // On charge l'IA, mais aussi toutes les annonces pour faire le lien !
           const [aiData, allOffers, myApps] = await Promise.all([
             getFreelanceDashboardData(),
             getAvailableJobOffers(),
@@ -109,7 +100,6 @@ export default function DashboardFreelance() {
     navigate("/login");
   };
 
-  // --- ACTIONS DES BOUTONS ---
   const openOfferDetails = (offer) => {
     setViewedOffer(offer);
     setIsOfferModalOpen(true);
@@ -153,7 +143,6 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-teal/5">
-      {/* ... (HEADER ET SIDEBAR IDENTIQUES) ... */}
       <div className="md:hidden bg-navy p-4 flex justify-between items-center shadow-lg">
         <img src="/logo.png" alt="Logo" className="h-10" />
         <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-coral text-3xl"><HiMenu /></button>
@@ -170,7 +159,6 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
             <button key={item} onClick={() => { setActiveView(item); setIsMenuOpen(false); }}
               className={`w-full text-left p-4 rounded-xl transition-colors font-bold flex justify-between items-center ${activeView === item ? "bg-white/10 text-coral" : "text-sage hover:bg-white/5"}`}>
               <span>{item}</span>
-              {/* LA FAMEUSE PASTILLE ROUGE SI MESSAGE NON LU ! */}
               {item === "Messagerie" && notifs.unread_messages > 0 && (
                 <Badge color="failure" className="w-6 h-6 flex items-center justify-center rounded-full p-0 shadow-sm animate-pulse">{notifs.unread_messages}</Badge>
               )}
@@ -200,7 +188,6 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {aiMatches.length > 0 ? aiMatches.map((match, index) => {
                   
-                  // MAGIE : On retrouve la vraie annonce grâce à l'ID !
                   const actualOffer = fullOffersData.find(o => o.id === match.job_id);
 
                   return (
@@ -228,7 +215,6 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
                         <h3 className="text-lg font-bold text-gray-400 mb-4">Annonce N°{match.job_id} (Données indisponibles)</h3>
                       )}
                       
-                      {/* Le nouveau texte positif de l'IA */}
                       <div className="bg-teal/5 p-4 rounded-xl border border-teal/20 mb-6 flex-1">
                         <p className="text-navy text-sm leading-relaxed italic">
                           "{match.explication}"
@@ -270,7 +256,6 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
           </>
         )}
 
-        {/* --- MODALES IDENTIQUES AU JOB BOARD --- */}
         <Modal show={isOfferModalOpen} size="3xl" onClose={() => setIsOfferModalOpen(false)}>
           <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white rounded-t-lg">
             <h3 className="text-xl font-bold text-navy">Détails de la mission</h3>
@@ -354,7 +339,6 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
             )}
           </div>
         </Modal>
-           {/* ================= ONGLET : MES CANDIDATURES ================= */}
         {activeView === "Mes Candidatures" && (
           <>
             <header className="mb-10">
@@ -377,7 +361,6 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
                   </div>
                 ) : (
                   myApplications.map((app) => {
-                    // On retrouve les détails de l'annonce pour afficher le nom de la mission et de l'entreprise
                     const offer = fullOffersData.find(o => o.id === app.job_offer);
                     
                     return (
@@ -393,7 +376,6 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
                             )}
                           </div>
                           
-                          {/* BADGES DE STATUT */}
                           <div className="flex-shrink-0">
                             {app.status === 'ACCEPTED' && <Badge color="success" icon={HiCheckCircle} className="px-4 py-2 text-sm font-bold">Candidature Acceptée !</Badge>}
                             {app.status === 'REJECTED' && <Badge color="failure" icon={HiXCircle} className="px-4 py-2 text-sm font-bold">Candidature Déclinée</Badge>}
@@ -401,7 +383,6 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
                           </div>
                         </div>
 
-                        {/* MESSAGE DU CANDIDAT (RAPPEL) */}
                         {app.cover_message && (
                           <div className="mb-4">
                             <p className="text-xs font-bold text-gray-400 uppercase mb-1">Votre message :</p>
@@ -409,7 +390,6 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
                           </div>
                         )}
 
-                        {/* MESSAGE DE L'ENTREPRISE (IA) EN CAS DE REFUS */}
                         {app.status === 'REJECTED' && app.rejection_message && (
                           <div className="mt-4 bg-coral/5 border border-coral/20 p-4 rounded-xl">
                             <p className="text-xs font-black text-coral uppercase mb-2 flex items-center">
@@ -418,10 +398,8 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
                             <p className="text-sm text-gray-800 leading-relaxed">{app.rejection_message}</p>
                           </div>
                         )}
-                        
-                        {/* ======================================================== */}
-                        {/* LE NOUVEAU BLOC ACCEPTÉ AVEC LE BOUTON MESSAGERIE        */}
-                        {/* ======================================================== */}
+                      
+                  
                         {app.status === 'ACCEPTED' && (
                           <div className="mt-4 bg-green-50 border border-green-200 p-4 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <p className="text-sm text-green-800 font-bold flex items-center">
@@ -450,7 +428,6 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
           </>
         )}
 
-        {/* ================= ONGLET : MESSAGERIE ================= */}
         {activeView === "Messagerie" && (
           <>
             <header className="mb-10">
@@ -479,11 +456,9 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
                         {conv.name}
                         {conv.unread_count > 0 && <Badge color="failure" className="ml-3 animate-pulse">Nouveau</Badge>}
                       </h4>
-                      {/* LE TITRE DE LA MISSION */}
                       <span className="text-xs font-bold text-teal bg-teal/5 px-2 py-1 rounded-md w-max mt-1 mb-1">
                         🏷️ Mission : {conv.job_title}
                       </span>
-                      {/* LE DERNIER MESSAGE */}
                       <p className={`text-sm truncate max-w-md ${conv.unread_count > 0 ? 'text-navy font-bold' : 'text-gray-500'}`}>
                         {conv.last_message === '__CHAT_CLOSED__' ? '🔒 Conversation clôturée' : conv.last_message}
                       </p>
@@ -501,7 +476,6 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
 
       </main>
 
-      {/* LA MODALE EST PLACÉE ICI, À L'EXTÉRIEUR DU MAIN POUR S'AFFICHER PAR DESSUS TOUT */}
       <FreelanceChatModal 
         show={isChatModalOpen} 
         onClose={() => setIsChatModalOpen(false)} 

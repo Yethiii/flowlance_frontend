@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardFreelance from "./dashboardFreelance";
 import DashboardCompany from "./dashboardCompany";
-import { getCurrentUser } from "../services/api"; // On importe la nouvelle fonction
+import { getCurrentUser } from "../services/api"; 
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -12,12 +12,10 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchUserRole = async () => {
       try {
-        // On va chercher les vraies données dans Django
         const userData = await getCurrentUser();
-        setRole(userData.role); // userData.role contiendra "FREELANCE" ou "COMPANY"
+        setRole(userData.role); 
       } catch (error) {
         console.error("Erreur d'authentification:", error);
-        // Si le token est expiré ou invalide, on le supprime et on renvoie au login
         localStorage.removeItem("token");
         navigate("/login");
       } finally {
@@ -39,7 +37,6 @@ export default function Dashboard() {
     );
   }
 
-  // L'Aiguillage réel basé sur la base de données !
   if (role === "FREELANCE") {
     return <DashboardFreelance />;
   } else if (role === "COMPANY") {

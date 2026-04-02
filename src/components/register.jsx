@@ -1,32 +1,29 @@
 import { useState } from "react";
 import { Label, TextInput, Card, Select } from "flowbite-react";
 import { Link, useNavigate } from "react-router-dom";
-import { registerUser } from "../services/api"; // On importe la nouvelle fonction !
+import { registerUser } from "../services/api"; 
 
 export default function Register() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("FREELANCE");
-  const [error, setError] = useState(""); // Pour afficher les erreurs Django
+  const [error, setError] = useState(""); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // On nettoie les anciennes erreurs
+    setError(""); 
 
     try {
-      // On envoie les données à Django
       await registerUser({ 
         email: email, 
         password: password, 
-        role: role // Vérifie si ton backend attend 'role' ou 'user_type'
+        role: role 
       });
       
-      // Si ça marche, on le redirige vers le login pour qu'il se connecte !
-      // (Ou vers '/dashboard' si ton backend connecte l'utilisateur automatiquement)
       navigate("/login");
     } catch (err) {
-      setError(err.message); // Affiche "Cet email existe déjà", etc.
+      setError(err.message); 
     }
   };
 
@@ -43,10 +40,8 @@ export default function Register() {
           </p>
         </div>
 
-        {/* On branche la fonction handleSubmit ici */}
         <form className="flex flex-col gap-6 mt-8" onSubmit={handleSubmit}>
           
-          {/* Bloc d'affichage d'erreur */}
           {error && <p className="text-coral text-sm font-bold bg-coral/10 p-3 rounded-lg border border-coral/20">{error}</p>}
 
           <div className="w-full">
@@ -60,7 +55,6 @@ export default function Register() {
               onChange={(e) => setRole(e.target.value)}
               style={{ backgroundColor: 'white', color: '#212E53' }}
             >
-              {/* Valeurs en majuscules pour correspondre à la base de données Django */}
               <option value="FREELANCE">Freelance</option>
               <option value="COMPANY">Entreprise</option>
             </Select>

@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Spinner, Alert } from 'flowbite-react';
 import { HiDocumentText, HiSparkles, HiInformationCircle, HiUpload, HiCheckCircle } from 'react-icons/hi';
-import { analyzeCVWithAI, getMyFreelanceProfile } from '../services/api'; // On importe getMyFreelanceProfile
+import { analyzeCVWithAI, getMyFreelanceProfile } from '../services/api'; 
 
 export default function FreelanceCVCoach() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [isLoadingInit, setIsLoadingInit] = useState(true); // Pour le chargement initial
+  const [isLoadingInit, setIsLoadingInit] = useState(true); 
   const [aiAdvice, setAiAdvice] = useState("");
   const [error, setError] = useState("");
 
-  // Au chargement de la page, on vérifie s'il y a déjà un conseil sauvegardé
   useEffect(() => {
     const loadSavedAdvice = async () => {
       try {
@@ -28,10 +27,8 @@ export default function FreelanceCVCoach() {
     loadSavedAdvice();
   }, []);
 
-  // Gestion de la sélection du nouveau fichier
   const handleFileChange = (e) => {
     setError("");
-    // On ne vide pas setAiAdvice("") tout de suite pour qu'il garde l'ancien conseil visible en attendant
     const file = e.target.files[0];
     
     if (file) {
@@ -44,7 +41,6 @@ export default function FreelanceCVCoach() {
     }
   };
 
-  // Envoi au backend
   const handleAnalyze = async () => {
     if (!selectedFile) return;
     
@@ -53,7 +49,7 @@ export default function FreelanceCVCoach() {
 
     try {
       const response = await analyzeCVWithAI(selectedFile);
-      setAiAdvice(response.cv_advice); // Met à jour avec le nouveau conseil
+      setAiAdvice(response.cv_advice); 
     } catch (err) {
       setError(err.message);
     } finally {
@@ -73,7 +69,6 @@ export default function FreelanceCVCoach() {
 
       <Card className="border-t-4 border-t-coral shadow-xl rounded-2xl p-4 md:p-8">
         
-        {/* ZONE DE DÉPÔT DE FICHIER */}
         <div className="flex flex-col items-center justify-center w-full mb-8">
           <label 
             htmlFor="dropzone-file" 
@@ -102,14 +97,12 @@ export default function FreelanceCVCoach() {
           </label>
         </div>
 
-        {/* AFFICHAGE DES ERREURS */}
         {error && (
           <Alert color="failure" icon={HiInformationCircle} className="mb-6">
             <span className="font-bold">Erreur :</span> {error}
           </Alert>
         )}
 
-        {/* BOUTON D'ACTION */}
         <div className="flex justify-center mb-8">
           <button 
             onClick={handleAnalyze} 
@@ -130,7 +123,6 @@ export default function FreelanceCVCoach() {
           </button>
         </div>
 
-        {/* RÉSULTAT DE L'ANALYSE IA (MÉMORISÉ OU NOUVEAU) */}
         {aiAdvice && (
           <div className="bg-teal/5 border border-teal/20 rounded-2xl p-6 md:p-8 animate-fade-in">
             <h3 className="text-xl font-black text-teal flex items-center mb-6">

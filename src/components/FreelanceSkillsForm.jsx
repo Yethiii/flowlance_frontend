@@ -11,7 +11,6 @@ export default function FreelanceSkillsForm() {
   const [isLoading, setIsLoading] = useState(true);
   const [message, setMessage] = useState({ text: "", type: "" });
 
-  // 1. Charger les compétences existantes
   const loadSkills = async () => {
     try {
       const data = await getMySkills();
@@ -28,7 +27,6 @@ export default function FreelanceSkillsForm() {
     loadSkills();
   }, []);
 
-  // 2. Ajouter une compétence
   const handleAddSkill = async (e) => {
     e.preventDefault();
     if (!newSkillName.trim()) return;
@@ -38,9 +36,9 @@ export default function FreelanceSkillsForm() {
         skill_name: newSkillName, 
         skill_level: newSkillLevel 
       });
-      setNewSkillName(""); // On vide le champ texte
-      setNewSkillLevel("BEGINNER"); // On remet par défaut
-      loadSkills(); // On recharge la liste pour voir la nouveauté
+      setNewSkillName(""); 
+      setNewSkillLevel("BEGINNER"); 
+      loadSkills(); 
       setMessage({ text: "Compétence ajoutée !", type: "success" });
     } catch (error) {
       console.error(error);
@@ -48,17 +46,15 @@ export default function FreelanceSkillsForm() {
     }
   };
 
-  // 3. Supprimer une compétence
   const handleDeleteSkill = async (id) => {
     try {
       await deleteSkill(id);
-      loadSkills(); // On recharge la liste
+      loadSkills(); 
     } catch {
       setMessage({ text: "Impossible de supprimer la compétence.", type: "error" });
     }
   };
 
-  // 4. Définir une couleur selon le niveau
   const getLevelColor = (level) => {
     switch(level) {
       case 'BEGINNER': return 'bg-gray-100 text-gray-700 border-gray-200';
@@ -82,7 +78,6 @@ export default function FreelanceSkillsForm() {
         </div>
       )}
 
-      {/* FORMULAIRE D'AJOUT */}
       <form onSubmit={handleAddSkill} className="bg-gray-50 p-6 rounded-xl border border-gray-100 mb-8 flex flex-col md:flex-row items-end gap-4">
         <div className="flex-1 w-full">
           <Label htmlFor="skillName" className="font-bold text-navy mb-2 block">
@@ -122,7 +117,6 @@ export default function FreelanceSkillsForm() {
         </button>
       </form>
 
-      {/* LISTE DES COMPÉTENCES */}
       <h3 className="font-black text-navy text-lg mb-4">Compétences enregistrées</h3>
       
       {skills.length === 0 ? (

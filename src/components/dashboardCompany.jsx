@@ -17,7 +17,6 @@ export default function DashboardCompany() {
   const [aiMatches, setAiMatches] = useState([]);
   const [isDashboardLoading, setIsDashboardLoading] = useState(false);
 
-  // --- ÉTATS POUR LES ACTIONS (MODALES) ---
   const [isCandidateModalOpen, setIsCandidateModalOpen] = useState(false);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [selectedFreelanceId, setSelectedFreelanceId] = useState(null);
@@ -27,9 +26,7 @@ export default function DashboardCompany() {
   const [directChatName, setDirectChatName] = useState("");
   const [isDirectChatOpen, setIsDirectChatOpen] = useState(false);
 
-  // ==========================================
-  // 1. CHARGEMENT DU TABLEAU DE BORD (IA)
-  // ==========================================
+
   useEffect(() => {
     if (activeView === "Tableau de bord") {
       const fetchMatches = async () => {
@@ -49,17 +46,12 @@ export default function DashboardCompany() {
     }
   }, [activeView]);
 
-  // ==========================================
-  // 2. MOTEUR TEMPS RÉEL POUR LA MESSAGERIE
-  // ==========================================
   useEffect(() => {
     const fetchRealTimeData = async () => {
       try {
-        // 1. On récupère les pastilles rouges (messages ET nouvelles candidatures)
         const notifData = await getNotificationsCount();
         setNotifs(notifData);
 
-        // 2. Si on est sur l'onglet Messagerie, on rafraîchit la liste
         if (activeView === "Messagerie") {
           const convos = await getConversationsList();
           setConversations(convos);
@@ -67,8 +59,8 @@ export default function DashboardCompany() {
       } catch (error) { console.error("Erreur Temps Réel", error); }
     };
 
-    fetchRealTimeData(); // Premier appel immédiat
-    const interval = setInterval(fetchRealTimeData, 3000); // Rafraîchit toutes les 3 secondes
+    fetchRealTimeData(); 
+    const interval = setInterval(fetchRealTimeData, 3000); 
     return () => clearInterval(interval);
   }, [activeView]);
   
@@ -82,7 +74,6 @@ export default function DashboardCompany() {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-teal/5">
-      {/* ... (HEADER ET SIDEBAR IDENTIQUES) ... */}
       <div className="md:hidden bg-navy p-4 flex justify-between items-center shadow-lg">
         <img src="/logo.png" alt="Logo" className="h-10" />
         <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-coral text-3xl"><HiMenu /></button>
@@ -100,12 +91,10 @@ export default function DashboardCompany() {
               className={`w-full text-left p-4 rounded-xl transition-colors font-bold flex justify-between items-center ${activeView === item ? "bg-white/10 text-teal" : "text-gray-400 hover:bg-white/5"}`}>
               <span>{item}</span>
               
-              {/* PASTILLE ROUGE : NOUVEAUX MESSAGES */}
               {item === "Messagerie" && notifs.unread_messages > 0 && (
                 <Badge color="failure" className="w-6 h-6 flex items-center justify-center rounded-full p-0 shadow-sm animate-pulse">{notifs.unread_messages}</Badge>
               )}
               
-              {/* PASTILLE JAUNE/ORANGE : NOUVELLES CANDIDATURES EN ATTENTE */}
               {item === "Candidatures" && notifs.pending_applications > 0 && (
                 <Badge color="warning" className="w-6 h-6 flex items-center justify-center rounded-full p-0 shadow-sm animate-pulse">{notifs.pending_applications}</Badge>
               )}
@@ -161,7 +150,6 @@ export default function DashboardCompany() {
                                 </div>
                               </div>
                               
-                              {/* --- LES NOUVEAUX BOUTONS --- */}
                               <div className="mt-4 pt-4 border-t border-gray-200 flex justify-end gap-4">
                                 <button 
                                   onClick={() => { setSelectedFreelanceId(freelance.freelance_id); setIsMessageModalOpen(true); }}
@@ -186,7 +174,6 @@ export default function DashboardCompany() {
             )}
           </>
         )}
-        {/* ================= ONGLET : MESSAGERIE ================= */}
         {activeView === "Messagerie" && (
           <>
             <header className="mb-10">
@@ -215,11 +202,9 @@ export default function DashboardCompany() {
                         {conv.name}
                         {conv.unread_count > 0 && <Badge color="failure" className="ml-3 animate-pulse">Nouveau</Badge>}
                       </h4>
-                      {/* LE TITRE DE LA MISSION */}
                       <span className="text-xs font-bold text-teal bg-teal/5 px-2 py-1 rounded-md w-max mt-1 mb-1">
                         🏷️ Mission : {conv.job_title}
                       </span>
-                      {/* LE DERNIER MESSAGE */}
                       <p className={`text-sm truncate max-w-md ${conv.unread_count > 0 ? 'text-navy font-bold' : 'text-gray-500'}`}>
                         {conv.last_message === '__CHAT_CLOSED__' ? '🔒 Conversation clôturée' : conv.last_message}
                       </p>
@@ -237,7 +222,6 @@ export default function DashboardCompany() {
         
       </main>
 
-      {/* --- MODALES "POUR LA SUITE" --- */}
       <FreelanceProfileModal 
         show={isCandidateModalOpen} 
         onClose={() => setIsCandidateModalOpen(false)} 

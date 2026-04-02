@@ -46,7 +46,6 @@ export default function DirectChatModal({ show, onClose, targetUserId, targetNam
     } catch (error) { console.error(error); }
   };
 
-  // --- ACTIONS DE L'ENTREPRISE ---
   const handleCloseChat = async () => {
     if (window.confirm("Voulez-vous vraiment clôturer cette conversation ? Le candidat ne pourra plus répondre.")) {
       try {
@@ -61,14 +60,13 @@ export default function DirectChatModal({ show, onClose, targetUserId, targetNam
       try {
         await deleteConversation(targetUserId);
         setMessages([]);
-        onClose(); // Ferme la fenêtre
+        onClose(); 
       } catch (error) { console.error(error); }
     }
   };
 
-  // --- VÉRIFICATION DU STATUT ---
   const isClosed = messages.some(m => m.content === "__CHAT_CLOSED__");
-  const displayMessages = messages.filter(m => m.content !== "__CHAT_CLOSED__"); // On cache le code technique
+  const displayMessages = messages.filter(m => m.content !== "__CHAT_CLOSED__"); 
 
   if (!show) return null;
 
@@ -80,17 +78,14 @@ export default function DirectChatModal({ show, onClose, targetUserId, targetNam
         </h3>
         
         <div className="flex items-center gap-1">
-          {/* BOUTONS D'ACTION DIRECTS (Uniquement Entreprise) */}
           {currentUser?.role === 'COMPANY' && (
             <>
-              {/* Le bouton Clôturer disparaît si c'est DÉJÀ clôturé */}
               {!isClosed && (
                 <button onClick={handleCloseChat} title="Clôturer la discussion" className="text-orange-400 hover:text-orange-600 hover:bg-orange-50 p-2 rounded-full transition-colors flex items-center">
                   <HiLockClosed className="h-6 w-6" />
                 </button>
               )}
               
-              {/* Le bouton Supprimer reste TOUJOURS visible pour l'entreprise */}
               <button onClick={handleDeleteChat} title="Supprimer l'historique" className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-full transition-colors flex items-center mr-2">
                 <HiTrash className="h-6 w-6" />
               </button>
@@ -113,7 +108,6 @@ export default function DirectChatModal({ show, onClose, targetUserId, targetNam
             const isMine = msg.sender === currentUser?.id;
             return (
               <div key={idx} className={`flex flex-col ${isMine ? "items-end" : "items-start"} mb-2`}>
-                {/* LE NOM AU-DESSUS DE LA BULLE */}
                 <span className="text-xs text-gray-400 font-bold mb-1 px-2">
                   {isMine ? "Vous" : targetName}
                 </span>
@@ -129,7 +123,6 @@ export default function DirectChatModal({ show, onClose, targetUserId, targetNam
           })
         )}
         
-        {/* LA BANNIÈRE VISUELLE SI C'EST CLÔTURÉ */}
         {isClosed && (
           <div className="mt-4 bg-orange-100 border border-orange-200 text-orange-800 p-3 rounded-xl text-center text-sm font-bold flex items-center justify-center shadow-sm">
             <HiLockClosed className="mr-2 h-5 w-5" /> L'entreprise a clôturé cette conversation.

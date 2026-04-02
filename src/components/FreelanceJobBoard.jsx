@@ -6,7 +6,7 @@ import {
 } from 'react-icons/hi';
 import { 
   getAvailableJobOffers, applyToJob, getSectors, getCompanyProfileById, 
-  getHardSkills, getSoftSkills, getMyApplications // <-- Nouveaux imports
+  getHardSkills, getSoftSkills, getMyApplications 
 } from '../services/api';
 
 export default function FreelanceJobBoard() {
@@ -14,18 +14,15 @@ export default function FreelanceJobBoard() {
   const [sectors, setSectors] = useState([]);
   const [hardSkillsList, setHardSkillsList] = useState([]);
   const [softSkillsList, setSoftSkillsList] = useState([]);
-  const [myApplications, setMyApplications] = useState([]); // Historique des candidatures
+  const [myApplications, setMyApplications] = useState([]); 
   const [isLoading, setIsLoading] = useState(true);
   
-  // États pour les filtres
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSector, setSelectedSector] = useState("");
 
-  // États pour LA LECTURE DE L'OFFRE EN GRAND
   const [viewedOffer, setViewedOffer] = useState(null);
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
 
-  // États pour la candidature
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [coverMessage, setCoverMessage] = useState("");
@@ -33,7 +30,6 @@ export default function FreelanceJobBoard() {
   const [applySuccess, setApplySuccess] = useState(false);
   const [isApplying, setIsApplying] = useState(false);
 
-  // États pour le profil Entreprise
   const [viewedCompany, setViewedCompany] = useState(null);
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
   const [isLoadingCompany, setIsLoadingCompany] = useState(false);
@@ -45,7 +41,6 @@ export default function FreelanceJobBoard() {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      // On charge TOUTES les données en parallèle pour aller plus vite
       const [fetchedOffers, fetchedSectors, fetchedHard, fetchedSoft, fetchedApps] = await Promise.all([
         getAvailableJobOffers(),
         getSectors(),
@@ -65,12 +60,10 @@ export default function FreelanceJobBoard() {
     }
   };
 
-  // Vérifie si le freelance a déjà postulé à une offre donnée
   const hasAlreadyApplied = (offerId) => {
     return myApplications.some(app => app.job_offer === offerId);
   };
 
-  // --- LOGIQUE DE FILTRAGE ---
   const filteredOffers = offers.filter(offer => {
     const matchesSearch = 
       (offer.offer_title?.toLowerCase().includes(searchTerm.toLowerCase())) || 
@@ -81,7 +74,6 @@ export default function FreelanceJobBoard() {
     return matchesSearch && matchesSector;
   });
 
-  // --- ACTIONS ---
   const openOfferDetails = (offer) => {
     setViewedOffer(offer);
     setIsOfferModalOpen(true);
@@ -103,7 +95,6 @@ export default function FreelanceJobBoard() {
       const newApplication = await applyToJob(selectedOffer.id, coverMessage);
       setApplySuccess(true);
       
-      // On ajoute la nouvelle candidature à la liste locale pour griser le bouton immédiatement
       setMyApplications([...myApplications, newApplication]);
 
       setTimeout(() => {
@@ -140,7 +131,6 @@ export default function FreelanceJobBoard() {
         <p className="text-teal font-medium">Trouvez la mission qui correspond à vos compétences et postulez en un clic.</p>
       </div>
 
-      {/* --- BARRE DE FILTRES --- */}
       <div className="bg-white p-6 rounded-3xl shadow-lg border-t-4 border-t-teal mb-10 flex flex-col md:flex-row gap-4 items-center">
         <div className="flex-1 relative w-full">
           <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
@@ -166,7 +156,6 @@ export default function FreelanceJobBoard() {
         </div>
       </div>
 
-      {/* --- GRILLE DES OFFRES --- */}
       {filteredOffers.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-3xl shadow-sm border border-gray-100">
           <HiSearch className="mx-auto h-16 w-16 text-gray-300 mb-4" />
@@ -176,7 +165,7 @@ export default function FreelanceJobBoard() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredOffers.map(offer => {
-            const isApplied = hasAlreadyApplied(offer.id); // On vérifie si postulé
+            const isApplied = hasAlreadyApplied(offer.id); 
             
             return (
               <Card key={offer.id} className="hover:shadow-xl transition-all border-t-4 border-t-navy flex flex-col h-full bg-white relative">
@@ -213,7 +202,6 @@ export default function FreelanceJobBoard() {
                   </p>
                 </div>
                 
-                {/* --- BOUTON POSTULER (DYNAMIQUE) --- */}
                 <div className="mt-auto pt-4 border-t border-gray-100">
                   {isApplied ? (
                     <button disabled className="w-full bg-gray-100 text-gray-400 font-bold py-3 rounded-xl flex justify-center items-center cursor-not-allowed">
@@ -236,7 +224,6 @@ export default function FreelanceJobBoard() {
         </div>
       )}
 
-      {/* --- MODALE LECTURE DE L'OFFRE COMPLÈTE --- */}
       <Modal show={isOfferModalOpen} size="3xl" onClose={() => setIsOfferModalOpen(false)}>
         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white rounded-t-lg">
           <h3 className="text-xl font-bold text-navy">Détails de la mission</h3>
@@ -258,7 +245,6 @@ export default function FreelanceJobBoard() {
                 <div className="flex items-center"><HiLocationMarker className="mr-2 text-coral h-5 w-5"/> {viewedOffer.offer_location || 'Non spécifié'}</div>
               </div>
 
-              {/* NOUVEAU : AFFICHAGE DES SKILLS */}
               {(viewedOffer.offer_hardskills?.length > 0 || viewedOffer.offer_softskills?.length > 0) && (
                 <div className="mb-8">
                   <h3 className="text-lg font-bold text-navy mb-3">Compétences recherchées</h3>
@@ -302,7 +288,6 @@ export default function FreelanceJobBoard() {
         </div>
       </Modal>
 
-      {/* --- MODALE DE CANDIDATURE --- */}
       <Modal show={isApplyModalOpen} size="lg" onClose={() => !isApplying && setIsApplyModalOpen(false)}>
         <div className="p-6 border-b border-gray-100 flex justify-between bg-white rounded-t-lg">
           <h3 className="text-xl font-black text-navy">Envoyer ma candidature</h3>
@@ -344,7 +329,6 @@ export default function FreelanceJobBoard() {
         )}
       </Modal>
 
-      {/* --- MODALE DU PROFIL ENTREPRISE --- */}
       <Modal show={isCompanyModalOpen} size="2xl" onClose={() => setIsCompanyModalOpen(false)}>
         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white rounded-t-lg">
           <h3 className="text-2xl font-black text-navy flex items-center">

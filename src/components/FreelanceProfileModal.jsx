@@ -18,7 +18,6 @@ export default function FreelanceProfileModal({ show, onClose, freelanceId }) {
       const fetchData = async () => {
         setIsLoading(true);
         try {
-          // On récupère le profil ET les listes de référence pour traduire les IDs des secteurs/soft skills
           const [profileData, sectorsData, softSkillsData] = await Promise.all([
             getFreelanceProfileById(freelanceId),
             getSectors(),
@@ -39,7 +38,6 @@ export default function FreelanceProfileModal({ show, onClose, freelanceId }) {
 
   if (!show) return null;
 
-  // --- Helpers pour le formatage des données ---
   const getAvailabilityText = (val) => {
     if (val === "FULL") return "Temps plein";
     if (val === "PART") return "Temps partiel";
@@ -87,7 +85,6 @@ export default function FreelanceProfileModal({ show, onClose, freelanceId }) {
         ) : profile ? (
           <div className="space-y-6">
 
-            {/* --- 1. EN-TÊTE PRINCIPALE --- */}
             <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-8 relative overflow-hidden">
               <div className="absolute top-0 right-0 bg-coral text-white font-black px-6 py-2 rounded-bl-3xl shadow-sm">
                 {getAvailabilityText(profile.freelance_availability)}
@@ -122,10 +119,8 @@ export default function FreelanceProfileModal({ show, onClose, freelanceId }) {
               </div>
             </div>
 
-            {/* --- 2. COMPÉTENCES (SECTEURS, HARD, SOFT) --- */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               
-              {/* SECTEURS */}
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 lg:col-span-1">
                 <h4 className="text-lg font-black text-navy mb-4 flex items-center"><HiBriefcase className="mr-2 text-teal" /> Secteurs</h4>
                 <div className="flex flex-wrap gap-2">
@@ -136,7 +131,6 @@ export default function FreelanceProfileModal({ show, onClose, freelanceId }) {
                 </div>
               </div>
 
-              {/* SOFT SKILLS */}
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 lg:col-span-2">
                 <h4 className="text-lg font-black text-navy mb-4 flex items-center"><HiStar className="mr-2 text-teal" /> Savoir-être (Soft Skills)</h4>
                 <div className="flex flex-wrap gap-2">
@@ -147,14 +141,12 @@ export default function FreelanceProfileModal({ show, onClose, freelanceId }) {
                 </div>
               </div>
 
-              {/* HARD SKILLS */}
               <div className="bg-teal/5 p-6 rounded-3xl shadow-sm border border-teal/20 lg:col-span-3">
                 <h4 className="text-xl font-black text-navy mb-4 flex items-center"><HiCode className="mr-2 text-coral h-6 w-6" /> Expertises Techniques</h4>
                 {profile.skill_levels && profile.skill_levels.length > 0 ? (
                   <div className="flex flex-wrap gap-3">
                     {profile.skill_levels.map((skill, idx) => (
                       <div key={idx} className="bg-white border border-gray-200 px-4 py-2 rounded-xl flex items-center shadow-sm">
-                        {/* On gère les deux types de retours possibles de ton backend pour le nom de la compétence */}
                         <span className="font-black text-navy mr-2">{skill.skill_name || skill.skill?.name || "Compétence"}</span>
                         <Badge color="light">Niv. {skill.level}</Badge>
                       </div>
@@ -166,10 +158,8 @@ export default function FreelanceProfileModal({ show, onClose, freelanceId }) {
               </div>
             </div>
 
-            {/* --- 3. PARCOURS (ÉDUCATION, CERTIFS, PERMIS, LANGUES) --- */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               
-              {/* ÉDUCATION */}
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
                 <h4 className="text-lg font-black text-navy mb-4 flex items-center border-b border-gray-100 pb-2"><HiAcademicCap className="mr-2 text-coral h-5 w-5" /> Formation</h4>
                 <div className="space-y-4">
@@ -183,7 +173,6 @@ export default function FreelanceProfileModal({ show, onClose, freelanceId }) {
                 </div>
               </div>
 
-              {/* CERTIFICATIONS */}
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
                 <h4 className="text-lg font-black text-navy mb-4 flex items-center border-b border-gray-100 pb-2"><HiBadgeCheck className="mr-2 text-coral h-5 w-5" /> Certifications</h4>
                 <div className="space-y-4">
@@ -197,7 +186,6 @@ export default function FreelanceProfileModal({ show, onClose, freelanceId }) {
                 </div>
               </div>
 
-              {/* LANGUES */}
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
                 <h4 className="text-lg font-black text-navy mb-4 flex items-center border-b border-gray-100 pb-2"><HiTranslate className="mr-2 text-coral h-5 w-5" /> Langues</h4>
                 <div className="flex flex-wrap gap-2">
@@ -210,7 +198,6 @@ export default function FreelanceProfileModal({ show, onClose, freelanceId }) {
                 </div>
               </div>
 
-              {/* PERMIS */}
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
                 <h4 className="text-lg font-black text-navy mb-4 flex items-center border-b border-gray-100 pb-2"><HiOutlineTruck className="mr-2 text-coral h-5 w-5" /> Permis & Habilitations</h4>
                 <div className="flex flex-wrap gap-2">

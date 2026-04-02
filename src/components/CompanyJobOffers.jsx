@@ -17,13 +17,11 @@ export default function CompanyJobOffers() {
   const [softSkillsList, setSoftSkillsList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Gestion des modales
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [formError, setFormError] = useState("");
 
-  // Données du formulaire
   const [formData, setFormData] = useState({
     offer_title: '',
     offer_sector: '',
@@ -34,15 +32,12 @@ export default function CompanyJobOffers() {
     offer_is_active: true
   });
 
-  // États pour les menus déroulants d'ajout
   const [selectedHardSkill, setSelectedHardSkill] = useState("");
   const [selectedSoftSkill, setSelectedSoftSkill] = useState("");
 
-  // IA State
   const [aiKeywords, setAiKeywords] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Chargement initial
   useEffect(() => {
     fetchData();
   }, []);
@@ -67,7 +62,6 @@ export default function CompanyJobOffers() {
     }
   };
 
-  // --- ACTIONS DU FORMULAIRE ---
   const handleOpenForm = (offer = null) => {
     setFormError("");
     if (offer) {
@@ -78,14 +72,14 @@ export default function CompanyJobOffers() {
         offer_description: offer.offer_description || '',
         offer_hardskills: offer.offer_hardskills || [],
         offer_softskills: offer.offer_softskills || [],
-        offer_is_active: offer.offer_is_active !== undefined ? offer.offer_is_active : true // <-- NOUVEAU
+        offer_is_active: offer.offer_is_active !== undefined ? offer.offer_is_active : true 
       });
       setSelectedOffer(offer);
     } else {
       setFormData({ 
         offer_title: '', offer_sector: '', offer_location: '', offer_description: '',
         offer_hardskills: [], offer_softskills: [],
-        offer_is_active: true // <-- NOUVEAU
+        offer_is_active: true 
       });
       setSelectedOffer(null);
     }
@@ -95,7 +89,6 @@ export default function CompanyJobOffers() {
     setIsFormModalOpen(true);
   };
 
-  // Ajout / Suppression des Skills
   const handleAddHardSkill = () => {
     if (selectedHardSkill && !formData.offer_hardskills.includes(parseInt(selectedHardSkill))) {
       setFormData({ ...formData, offer_hardskills: [...formData.offer_hardskills, parseInt(selectedHardSkill)] });
@@ -154,7 +147,6 @@ export default function CompanyJobOffers() {
     }
   };
 
-  // --- L'ASSISTANT IA ---
   const handleGenerateAI = async () => {
     if (!aiKeywords) return alert("Veuillez entrer quelques mots-clés d'abord.");
     setIsGenerating(true);
@@ -179,7 +171,6 @@ export default function CompanyJobOffers() {
   return (
     <div className="max-w-6xl mx-auto pb-20">
       
-      {/* EN-TÊTE */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <div>
           <h2 className="text-3xl font-black text-navy uppercase tracking-tight">Mes Annonces</h2>
@@ -193,7 +184,6 @@ export default function CompanyJobOffers() {
         </button>
       </div>
 
-      {/* GRILLE DES ANNONCES */}
       {offers.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-3xl shadow-sm border border-gray-100">
           <HiBriefcase className="mx-auto h-16 w-16 text-gray-300 mb-4" />
@@ -219,7 +209,6 @@ export default function CompanyJobOffers() {
                 <HiLocationMarker className="mr-1 text-coral"/> {offer.offer_location || 'Non spécifié'}
               </div>
               
-              {/* BOUTONS D'ACTION */}
               <div className="flex justify-between mt-auto pt-4 border-t border-gray-100">
                 <button onClick={() => { setSelectedOffer(offer); setIsPreviewModalOpen(true); }} className="text-teal hover:text-navy transition-colors p-2" title="Aperçu">
                   <HiEye className="h-5 w-5" />
@@ -238,12 +227,10 @@ export default function CompanyJobOffers() {
         </div>
       )}
 
-      {/* MODALE DE CRÉATION / MODIFICATION */}
       <Modal show={isFormModalOpen} size="4xl" onClose={() => setIsFormModalOpen(false)}>
         <div className="p-6 max-h-[70vh] overflow-y-auto bg-white">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
-            {/* 1. L'ALERTE D'ERREUR */}
             {formError && (
               <div className="md:col-span-2">
                 <Alert color="failure" icon={HiInformationCircle}>
@@ -295,7 +282,6 @@ export default function CompanyJobOffers() {
               <TextInput value={formData.offer_location} onChange={(e) => setFormData({...formData, offer_location: e.target.value})} placeholder="Ex: Bruxelles (Hybride)" required />
             </div>
 
-            {/* --- HARD SKILLS --- */}
             <div>
               <label className="block text-sm font-bold text-navy mb-2">Hard Skills requises</label>
               <div className="flex gap-2 mb-3">
@@ -317,7 +303,6 @@ export default function CompanyJobOffers() {
               </div>
             </div>
 
-            {/* --- SOFT SKILLS --- */}
             <div>
               <label className="block text-sm font-bold text-navy mb-2">Soft Skills requises</label>
               <div className="flex gap-2 mb-3">
@@ -391,7 +376,6 @@ export default function CompanyJobOffers() {
         </div>
       </Modal>
 
-      {/* MODALE D'APERÇU (PREVIEW POUR LE FREELANCE) */}
       <Modal show={isPreviewModalOpen} size="3xl" onClose={() => setIsPreviewModalOpen(false)}>
         <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-white rounded-t-lg">
           <h3 className="text-xl font-bold text-navy">Aperçu de l'annonce</h3>
@@ -416,7 +400,6 @@ export default function CompanyJobOffers() {
                 </div>
               </div>
 
-              {/* AFFICHAGE DES SKILLS DANS L'APERÇU */}
               {(selectedOffer.offer_hardskills?.length > 0 || selectedOffer.offer_softskills?.length > 0) && (
                 <div className="mb-8">
                   <h3 className="text-lg font-bold text-navy mb-3">Compétences recherchées</h3>

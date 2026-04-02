@@ -20,11 +20,9 @@ export default function FreelanceProfileForm() {
   const [isLoading, setIsLoading] = useState(true);
   const [message, setMessage] = useState({ text: "", type: "" });
 
-  // --- MODALS DE CONFIRMATION (Thème Flowlance) ---
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  // ================= ONGLET 1 : PROFIL =================
   const [birthDate, setBirthDate] = useState("");
   const [gender, setGender] = useState("");
   const [location, setLocation] = useState("");
@@ -40,7 +38,6 @@ export default function FreelanceProfileForm() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
 
-  // ================= ONGLET 2 : COMPÉTENCES & LANGUES =================
   const [sectors, setSectors] = useState([]);
   const [mySectors, setMySectors] = useState([]);
   const [selectedSector, setSelectedSector] = useState("");
@@ -54,7 +51,6 @@ export default function FreelanceProfileForm() {
   const [languages, setLanguages] = useState([]);
   const [newLang, setNewLang] = useState({ language: "", level: "B1" });
 
-  // ================= ONGLET 3 : PARCOURS PRO =================
   const [educations, setEducations] = useState([]);
   const [newEdu, setNewEdu] = useState({ degree_type: "BAC", diploma_name: "", school_name: "", year_obtained: "", proof_file: null });
 
@@ -108,7 +104,6 @@ export default function FreelanceProfileForm() {
     loadAllData();
   }, []);
 
-  // --- ACTIONS GLOBALES ---
   const handleGlobalSave = async () => {
     setMessage({ text: "Sauvegarde du profil en cours...", type: "info" });
     const formData = new FormData();
@@ -161,7 +156,6 @@ export default function FreelanceProfileForm() {
     setShowDeactivateModal(false);
     try {
       await deactivateAccount();
-      // On recharge la page : les données seront là, mais le statut is_active sera false
       window.location.reload(); 
     } catch (error) {
       console.error(error);
@@ -173,9 +167,7 @@ export default function FreelanceProfileForm() {
     setShowDeleteModal(false);
     try {
       await deleteAccount();
-      // Règle de sécurité : On détruit le badge d'accès du navigateur !
       localStorage.removeItem("token"); 
-      // On le renvoie violemment à l'accueil
       window.location.href = '/'; 
     } catch (error) {
       console.error(error);
@@ -183,7 +175,6 @@ export default function FreelanceProfileForm() {
     }
   };
 
-  // --- ACTIONS ONGLETS 2 & 3 ---
   const handleAddHardSkill = async () => {
     if (!newSkill.name || !newSkill.sector_id) return;
     await addSkill({ skill_name: newSkill.name, skill_level: newSkill.level, sector_id: newSkill.sector_id });
@@ -236,7 +227,6 @@ export default function FreelanceProfileForm() {
     setNewLicencePro({ license_type: "CACES_1", valid_until: "", proof_file: null });
   };
 
-  // --- HELPERS VISUELS ---
   const skillsBySector = skills.reduce((acc, s) => {
     const secName = s.sector_name || "Autres";
     if (!acc[secName]) acc[secName] = [];
@@ -284,7 +274,6 @@ export default function FreelanceProfileForm() {
 
         <Tabs variant="underline" className="px-6">
           
-          {/* ================= ONGLET 1 : PROFIL ================= */}
           <Tabs.Item active title="Profil Général" icon={HiUser}>
             <div className="space-y-6 p-4">
               
@@ -354,9 +343,7 @@ export default function FreelanceProfileForm() {
                         <FileInput 
                           accept=".pdf" 
                           onChange={(e) => setCvFile(e.target.files[0])} 
-                          /* On a supprimé le helperText ici ! */
                         />
-                        {/* On affiche le texte d'aide proprement en dessous avec un <p> */}
                         {existingCvUrl && (
                           <p className="mt-2 text-xs text-gray-500 font-medium">
                             Sélectionnez un nouveau fichier PDF pour écraser le précédent.
@@ -394,13 +381,11 @@ export default function FreelanceProfileForm() {
                 <h3 className="text-coral font-black mb-2 flex items-center gap-2 text-lg"><HiExclamationCircle /> Gestion du compte</h3>
                 <p className="text-sm text-gray-600 mb-4">Ces actions limitent ou suppriment votre visibilité sur la plateforme de manière définitive.</p>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  {/* Le bouton n'apparaît QUE si isActive est true */}
                   {isActive && (
                     <button onClick={() => setShowDeactivateModal(true)} className="px-6 py-2.5 rounded-xl font-bold bg-white border-2 transition-transform hover:scale-105" style={{ color: '#CE6A6B', borderColor: '#CE6A6B' }}>
                       Suspendre le compte
                     </button>
                   )}
-                  {/* Le bouton Supprimer est toujours là */}
                   <button onClick={() => setShowDeleteModal(true)} className="px-6 py-2.5 rounded-xl font-bold text-white transition-transform hover:scale-105" style={{ backgroundColor: '#CE6A6B' }}>
                     Supprimer le compte
                   </button>
@@ -410,7 +395,6 @@ export default function FreelanceProfileForm() {
             </div>
           </Tabs.Item>
 
-          {/* ================= ONGLET 2 : COMPÉTENCES & LANGUES ================= */}
           <Tabs.Item title="Compétences & Langues" icon={HiCode}>
             <div className="p-4 space-y-8">
               
@@ -454,7 +438,6 @@ export default function FreelanceProfileForm() {
                 </div>
               </div>
 
-              {/* --- NOUVEAU : BLOC DES SECTEURS D'ACTIVITÉ --- */}
               <div className="bg-teal/5 p-6 rounded-2xl border border-teal/20 mb-8">
                 <h3 className="text-lg font-black text-navy mb-2 border-b border-teal/20 pb-2">Mes Secteurs d'Activité</h3>
                 
@@ -495,7 +478,6 @@ export default function FreelanceProfileForm() {
                   })}
                 </div>
               </div>
-              {/* --- FIN DU BLOC SECTEURS --- */}
 
               <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
                 <h3 className="text-lg font-black text-navy mb-4 border-b pb-2">Langues Parlées</h3>
@@ -549,7 +531,6 @@ export default function FreelanceProfileForm() {
                     <Select value={newSkill.sector_id} onChange={e => setNewSkill({...newSkill, sector_id: e.target.value})}>
                       <option value="">Choisir...</option>
                       
-                      {/* On filtre la liste globale pour ne garder QUE les secteurs déjà présents dans mySectors */}
                       {sectors
                         .filter(s => mySectors.includes(s.id))
                         .map(s => <option key={s.id} value={s.id}>{s.name}</option>)
@@ -557,7 +538,6 @@ export default function FreelanceProfileForm() {
 
                     </Select>
                     
-                    {/* Petit message d'aide si la liste est vide */}
                     {mySectors.length === 0 && (
                       <p className="text-xs text-coral mt-1 italic">
                         Ajoutez d'abord un secteur d'activité ci-dessus.
@@ -601,7 +581,6 @@ export default function FreelanceProfileForm() {
                               className="cursor-pointer ml-3 text-gray-400 hover:text-coral transition-colors text-lg" 
                               onClick={async () => {
                                 await deleteSkill(s.id);
-                                // On met à jour l'affichage en filtrant la compétence supprimée
                                 setSkills(skills.filter(skill => skill.id !== s.id)); 
                               }} 
                             />                          </div>
@@ -615,14 +594,12 @@ export default function FreelanceProfileForm() {
             </div>
           </Tabs.Item>
 
-          {/* ================= ONGLET 3 : PARCOURS PRO ================= */}
           <Tabs.Item title="Éducation, Certifs & Licences" icon={HiAcademicCap}>
             <div className="p-4 space-y-8">
               <p className="text-sm text-gray-500 mb-2 italic">
                 Enrichissez votre profil en ajoutant vos différents diplômes, certificats et habilitations. <strong>Vous pouvez en ajouter autant que vous le souhaitez.</strong>
               </p>
 
-              {/* ÉDUCATION */}
               <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
                 <h3 className="text-xl font-black text-navy mb-4 border-b pb-2">Diplômes & Éducation</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end mb-6">
@@ -684,7 +661,6 @@ export default function FreelanceProfileForm() {
                 </div>
               </div>
 
-              {/* CERTIFICATIONS */}
               <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
                 <h3 className="text-xl font-black text-navy mb-4 border-b pb-2">Certifications (IT, Management, etc.)</h3>
                 <div className="flex flex-col md:flex-row gap-4 items-end mb-6">
@@ -732,7 +708,6 @@ export default function FreelanceProfileForm() {
                 </div>
               </div>
 
-              {/* PERMIS DE CONDUIRE */}
               <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
                 <h3 className="text-xl font-black text-navy mb-4 border-b pb-2 flex items-center gap-2"><HiOutlineTruck /> Permis de conduire</h3>
                 <div className="flex flex-col md:flex-row gap-4 items-end mb-6">
@@ -781,7 +756,6 @@ export default function FreelanceProfileForm() {
                 </div>
               </div>
 
-              {/* LICENCES ET HABILITATIONS PRO (CACES, etc.) */}
               <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
                 <h3 className="text-xl font-black text-navy mb-4 border-b pb-2 flex items-center gap-2"><HiAcademicCap /> Habilitations & Licences Pro</h3>
                 <div className="flex flex-col md:flex-row gap-4 items-end mb-6">
@@ -832,7 +806,6 @@ export default function FreelanceProfileForm() {
         </Tabs>
       </Card>
 
-      {/* BOUTON GLOBAL DE SAUVEGARDE */}
       <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] p-4 z-50 flex justify-center">
         <button 
           onClick={handleGlobalSave} 
@@ -843,7 +816,6 @@ export default function FreelanceProfileForm() {
         </button>
       </div>
 
-      {/* MODALS DE CONFIRMATION */}
       <Modal show={showDeactivateModal} size="md" popup onClose={() => setShowDeactivateModal(false)}>
         <div className="p-6 text-center">
           <HiExclamationCircle className="mx-auto mb-4 h-14 w-14 mt-4" style={{ color: '#CE6A6B' }} />

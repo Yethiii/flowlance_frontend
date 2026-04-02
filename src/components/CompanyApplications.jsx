@@ -12,7 +12,6 @@ export default function CompanyApplications() {
   const [isCandidateModalOpen, setIsCandidateModalOpen] = useState(false);
   const [selectedCandidateId, setSelectedCandidateId] = useState(null);
 
-  // --- NOUVEAUX ÉTATS POUR LE REFUS ---
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [appToReject, setAppToReject] = useState(null);
   const [rejectionMessage, setRejectionMessage] = useState("");
@@ -38,7 +37,6 @@ export default function CompanyApplications() {
     }
   };
 
-  // Modification : On gère le refus séparément de l'acceptation
   const handleAccept = async (appId) => {
     try {
       await updateApplicationStatus(appId, 'ACCEPTED');
@@ -48,7 +46,6 @@ export default function CompanyApplications() {
     }
   };
 
-  // Ouvre la modale de refus
   const openRejectModal = (app) => {
     setAppToReject(app);
     setRejectionMessage("");
@@ -56,13 +53,11 @@ export default function CompanyApplications() {
     setIsRejectModalOpen(true);
   };
 
-  // Génération IA du message
   const handleAIGeneration = async () => {
     if (!appToReject) return;
     setIsGeneratingAI(true);
     try {
       const fName = appToReject.freelance.first_name || "Candidat";
-      // NOUVEAU : On envoie `rejectionMessage` à l'API !
       const data = await generateRejectionMessageAI(fName, appToReject.job_title, rejectionMessage);
       setRejectionMessage(data.generated_message);
     } catch (error) {
@@ -73,7 +68,6 @@ export default function CompanyApplications() {
     }
   };
 
-  // Envoi final du refus
   const confirmRejection = async () => {
     if (!rejectionMessage.trim()) {
       setRejectError("Le message de refus ne peut pas être vide.");
@@ -170,7 +164,6 @@ export default function CompanyApplications() {
                     </div>
                   )}
 
-                  {/* Affichage du message de refus si la candidature a été rejetée */}
                   {app.status === 'REJECTED' && app.rejection_message && (
                     <div className="mt-2 bg-coral/5 p-3 rounded-lg border border-coral/20">
                       <p className="text-xs font-bold text-coral mb-1">VOTRE RÉPONSE (REFUS) :</p>
@@ -185,7 +178,6 @@ export default function CompanyApplications() {
         </div>
       )}
 
-      {/* MODALE DE REFUS AVEC IA */}
       <Modal show={isRejectModalOpen} size="xl" onClose={() => setIsRejectModalOpen(false)}>
         <div className="p-6 border-b border-gray-100 flex justify-between bg-white rounded-t-lg">
           <h3 className="text-xl font-black text-coral flex items-center"><HiXCircle className="mr-2 h-6 w-6" /> Décliner la candidature</h3>
@@ -205,7 +197,6 @@ export default function CompanyApplications() {
               className="text-xs font-bold text-white bg-teal px-3 py-1.5 rounded-lg flex items-center hover:bg-teal/80 transition-colors"
             >
               {isGeneratingAI ? <Spinner size="sm" className="mr-2" /> : <HiSparkles className="mr-1" />}
-              {/* C'est CE <span> qui empêche React de crasher ! */}
               <span>{rejectionMessage.trim() ? "Améliorer et corriger avec l'IA" : "Générer une réponse polie avec l'IA"}</span>
             </button>
           </div>

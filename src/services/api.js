@@ -1,9 +1,7 @@
 const BASE_URL = (import.meta.env.VITE_API_URL || "http://127.0.0.1:8000").replace(/\/$/, "");
 
-// On s'assure que TOUTES nos requêtes passent par /api
 const API_URL = `${BASE_URL}/api`;
 
-// --- AUTHENTIFICATION ---
 export const loginUser = async ({email, password}) => {
     const response = await fetch(`${API_URL}/token/`, {
         method: 'POST',
@@ -14,7 +12,6 @@ export const loginUser = async ({email, password}) => {
     return await response.json();
 };
 
-// --- PROFIL FREELANCE ---
 export const getMyFreelanceProfile = async () => {
     const token = localStorage.getItem("token");
     const response = await fetch(`${API_URL}/freelances/`, {
@@ -40,7 +37,6 @@ export const updateFreelanceProfile = async (profileId, formData) => {
     return await response.json();
 };
 
-// --- COMPÉTENCES (SKILLS) ---
 export const getMySkills = async () => {
     const token = localStorage.getItem("token");
     const response = await fetch(`${API_URL}/my-skills/`, {
@@ -54,7 +50,6 @@ export const getMySkills = async () => {
     return await response.json();
 };
 
-// --- HARD SKILLS ---
 export const addSkill = async (skillData) => {
     const token = localStorage.getItem("token");
     const res = await fetch(`${API_URL}/my-skills/`, {
@@ -121,7 +116,6 @@ export const getCurrentUser = async () => {
     return await response.json();
 };
 
-// --- SECTEURS & SOFT SKILLS ---
 export const getSectors = async () => {
     const token = localStorage.getItem("token");
     const res = await fetch(`${API_URL}/sectors/`, { headers: { 'Authorization': `Bearer ${token}` } });
@@ -164,7 +158,6 @@ export const deleteLicense = async (id) => {
     await fetch(`${API_URL}/licenses/${id}/`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }});
 };
 
-// --- LANGUES ---
 export const addLanguage = async (data) => {
     const token = localStorage.getItem("token");
     const res = await fetch(`${API_URL}/languages/`, {
@@ -179,7 +172,6 @@ export const deleteLanguage = async (id) => {
     await fetch(`${API_URL}/languages/${id}/`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }});
 };
 
-// --- CV & COMPTE ---
 export const updateCV = async (profileId, cvFile) => {
     const token = localStorage.getItem("token");
     const formData = new FormData();
@@ -198,7 +190,6 @@ export const updateCV = async (profileId, cvFile) => {
     return await res.json();
 }
 
-// --- GESTION DE LA VIE DU COMPTE ---
 
 export const deactivateAccount = async () => {
     const token = localStorage.getItem("token");
@@ -216,7 +207,6 @@ export const deleteAccount = async () => {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
     });
-    // La suppression renvoie un status 204 (No Content), donc on ne fait pas de .json()
     if (!res.ok) throw new Error("Erreur lors de la suppression");
     return true; 
 };
@@ -268,9 +258,7 @@ export const deleteCompanyAccount = async () => {
     return true; 
 };
 
-// ==========================================
-// --- GESTION DES ANNONCES (JOB OFFERS) ---
-// ==========================================
+
 
 export const getMyJobOffers = async () => {
     const token = localStorage.getItem("token");
@@ -329,7 +317,6 @@ export const deleteJobOffer = async (id) => {
     return true;
 };
 
-// --- L'ASSISTANT IA ---
 export const generateJobDescriptionAI = async (keywords) => {
     const token = localStorage.getItem("token");
     const res = await fetch(`${API_URL}/generate-job/`, {
@@ -362,9 +349,7 @@ export const getHardSkills = async () => {
     return await res.json();
 };
 
-// ==========================================
-// --- EXPLORATION & CANDIDATURES (FREELANCE) ---
-// ==========================================
+
 
 export const getAvailableJobOffers = async () => {
     const token = localStorage.getItem("token");
@@ -412,9 +397,7 @@ export const getMyApplications = async () => {
     return await res.json();
 };
 
-// ==========================================
-// --- COACHING CV IA (FREELANCE) ---
-// ==========================================
+
 
 export const analyzeCVWithAI = async (cvFile) => {
     const token = localStorage.getItem("token");
@@ -438,9 +421,6 @@ export const analyzeCVWithAI = async (cvFile) => {
     return await res.json();
 };
 
-// ==========================================
-// --- DASHBOARDS & MATCHING IA ---
-// ==========================================
 
 export const getFreelanceDashboardData = async () => {
     const token = localStorage.getItem("token");
@@ -460,7 +440,6 @@ export const getCompanyDashboardData = async () => {
     return await res.json();
 };
 
-// --- GESTION DES CANDIDATURES (CÔTÉ ENTREPRISE) ---
 
 export const getCompanyApplications = async () => {
     const token = localStorage.getItem("token");
@@ -496,7 +475,6 @@ export const updateApplicationStatus = async (applicationId, status, rejectionMe
     return await response.json();
 };
 
-// Ajoute la fonction de l'IA :
 export const generateRejectionMessageAI = async (freelanceName, jobTitle, draftMessage = "") => {
     const token = localStorage.getItem("token");
     const response = await fetch(`${API_URL}/generate-rejection/`, {
@@ -512,7 +490,6 @@ export const generateRejectionMessageAI = async (freelanceName, jobTitle, draftM
     return await response.json();
 };
 
-// --- PROFIL FREELANCE (VU PAR L'ENTREPRISE) ---
 export const getFreelanceProfileById = async (id) => {
     const token = localStorage.getItem("token");
     const response = await fetch(`${API_URL}/freelances/${id}/`, {
@@ -528,10 +505,6 @@ export const getFreelanceProfileById = async (id) => {
     }
     return await response.json();
 };
-
-// ==========================================
-// --- MESSAGERIE INTERNE (CHAT) ---
-// ==========================================
 
 export const getConversation = async (otherUserId) => {
     const token = localStorage.getItem("token");

@@ -20,7 +20,6 @@ export default function CookieBanner() {
   if (!isVisible) return null;
 
   return (
-    // Bandeau fixe reprenant le style de ta barre de sauvegarde (ombre portée vers le haut)
     <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] p-4 z-50 flex flex-col md:flex-row items-center justify-between gap-4">
       
       <div className="text-sm text-center md:text-left text-navy">
@@ -38,7 +37,6 @@ export default function CookieBanner() {
           Mentions Légales
         </Link>
         
-        {/* BOUTON : Exactement le même style "Coral" que tes boutons de validation */}
         <button 
           onClick={handleDismiss}
           className="w-full sm:w-auto px-6 py-2.5 text-white font-black rounded-xl hover:scale-105 transition-transform shadow-md flex items-center justify-center gap-2"

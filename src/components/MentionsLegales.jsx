@@ -8,7 +8,6 @@ export default function MentionsLegales() {
       
       <Card className="max-w-4xl w-full border-none shadow-2xl bg-white rounded-3xl overflow-hidden p-0">
         
-        {/* EN-TÊTE : Style Navy identique à ton Profil */}
         <div className="flex items-center justify-between p-6 bg-navy text-white">
           <span className="text-2xl font-black italic">
             MENTIONS LÉGALES
@@ -32,10 +31,8 @@ export default function MentionsLegales() {
           </div>
         </div>
 
-        {/* CONTENU PRINCIPAL */}
         <div className="p-6 md:p-8 space-y-8">
           
-          {/* Bloc type "Profil" avec fond gris clair */}
           <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
             <h3 className="text-lg font-black text-navy mb-4 border-b pb-2">1. Édition du site</h3>
             <p className="leading-relaxed text-gray-700">

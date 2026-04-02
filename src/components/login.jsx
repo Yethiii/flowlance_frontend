@@ -41,7 +41,6 @@ export default function LoginUser() {
 
           <div className="w-full">
             <Label htmlFor="email" className="font-bold mb-2 block" style={{ color: '#BED3C3' }}>Identifiant</Label>
-            {/* Ajout de sizing="lg" pour des champs plus grands et stylés */}
             <TextInput 
               id="email" 
               type="email" 
