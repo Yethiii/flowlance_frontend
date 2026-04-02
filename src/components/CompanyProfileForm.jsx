@@ -8,14 +8,12 @@ import {
   getCompanyProfile, updateCompanyProfile, deactivateCompanyAccount, deleteCompanyAccount 
 } from '../services/api';
 
-// Assure-toi d'avoir une fonction getSectors dans ton api.js (comme pour les freelances)
 import { getSectors } from '../services/api';
 
 export default function CompanyProfileForm() {
   const [profileId, setProfileId] = useState(null);
   const [isActive, setIsActive] = useState(false);
   
-  // Onglet 1 : Identité & Contact
   const [companyName, setCompanyName] = useState("");
   const [companySize, setCompanySize] = useState("1-10");
   const [companyDescription, setCompanyDescription] = useState("");
@@ -25,7 +23,6 @@ export default function CompanyProfileForm() {
   const [logoFile, setLogoFile] = useState(null);
   const [existingLogoUrl, setExistingLogoUrl] = useState(null);
 
-  // Onglet 2 : Siège & Légal
   const [street, setStreet] = useState("");
   const [number, setNumber] = useState("");
   const [postcode, setPostcode] = useState("");
@@ -34,12 +31,10 @@ export default function CompanyProfileForm() {
   const [tva, setTva] = useState("");
   const [bce, setBce] = useState("");
 
-  // Onglet 3 : Secteurs
   const [availableSectors, setAvailableSectors] = useState([]);
-  const [mySectors, setMySectors] = useState([]); // Tableau d'IDs
+  const [mySectors, setMySectors] = useState([]); 
   const [selectedSector, setSelectedSector] = useState("");
 
-  // UI States
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
@@ -105,7 +100,7 @@ export default function CompanyProfileForm() {
       }
       formData.append('company_website', finalWebsite);
     } else {
-      formData.append('company_website', ""); // On envoie vide proprement
+      formData.append('company_website', ""); 
     }
 
     if (companyLinkedin && companyLinkedin.trim() !== "") {
@@ -126,7 +121,6 @@ export default function CompanyProfileForm() {
     formData.append('company_TVA', tva);
     formData.append('company_BCE', bce);
 
-    // Ajout des secteurs (Django va traiter ça via la vue)
     mySectors.forEach(sectorId => {
       formData.append('company_sectors', sectorId);
     });
@@ -138,7 +132,7 @@ export default function CompanyProfileForm() {
     try {
       const updatedProfile = await updateCompanyProfile(profileId, formData);
       setExistingLogoUrl(updatedProfile.company_logo);
-      setLogoFile(null); // On reset le fichier après upload
+      setLogoFile(null); 
       setMessage({ text: "Profil entreprise sauvegardé avec succès !", type: "success" });
       window.scrollTo(0, 0);
     } catch (error) {
@@ -194,7 +188,6 @@ export default function CompanyProfileForm() {
         </div>
       </div>
 
-      {/* BANNIÈRE D'AVERTISSEMENT (Visible uniquement si inactif) */}
       {!isActive && (
         <div className="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 rounded-r-xl shadow-sm flex items-start">
           <HiExclamationCircle className="h-6 w-6 mr-3 text-yellow-500 flex-shrink-0 mt-0.5" />
@@ -207,16 +200,13 @@ export default function CompanyProfileForm() {
         </div>
       )}
 
-      {/* ALERTE DE SAUVEGARDE */}
       {message.text && (
         <div className={`p-4 mb-6 rounded-xl font-bold text-sm ${message.type === 'success' ? 'bg-sage/20 text-sage' : 'bg-red-100 text-red-700'}`}>
           {message.text}
         </div>
       )}
 
-      {/* ONGLETS */}
     <Tabs aria-label="Company Profile Tabs" className="mb-6">        
-        {/* --- ONGLET 1 : IDENTITÉ --- */}
         <Tabs.Item active title="Identité & Contact" icon={HiOfficeBuilding}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
             
@@ -270,7 +260,6 @@ export default function CompanyProfileForm() {
             </div>
           </div>
 
-          {/* ZONE DANGER (VISIBLE SUR LE PREMIER ONGLET) */}
           <div className="mt-12 pt-6 border-t border-red-100">
             <h3 className="text-lg font-black text-red-800 mb-4">Gestion du compte</h3>
             <div className="flex flex-col sm:flex-row gap-4">
@@ -286,7 +275,6 @@ export default function CompanyProfileForm() {
           </div>
         </Tabs.Item>
 
-        {/* --- ONGLET 2 : SIÈGE & LÉGAL --- */}
         <Tabs.Item title="Siège & Légal" icon={HiLocationMarker}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
             
@@ -332,7 +320,6 @@ export default function CompanyProfileForm() {
           </div>
         </Tabs.Item>
 
-        {/* --- ONGLET 3 : SECTEURS --- */}
         <Tabs.Item title="Secteurs d'activité" icon={HiBriefcase}>
           <div className="mt-4">
             <h3 className="text-lg font-black text-navy mb-4">Dans quels secteurs recrutez-vous ?</h3>
@@ -353,7 +340,6 @@ export default function CompanyProfileForm() {
               </button>
             </div>
 
-            {/* Affichage des secteurs sous forme de badges */}
             <div className="flex flex-wrap gap-3 p-6 bg-gray-50 rounded-2xl border border-gray-100">
               {mySectors.length === 0 ? (
                 <p className="text-gray-500 text-sm italic">Aucun secteur sélectionné pour le moment.</p>
@@ -378,7 +364,6 @@ export default function CompanyProfileForm() {
 
       </Tabs>
 
-      {/* BOUTON DE SAUVEGARDE GLOBAL */}
       <div className="mt-8 flex justify-end">
         <button 
           onClick={handleSave} 
@@ -390,7 +375,6 @@ export default function CompanyProfileForm() {
         </button>
       </div>
 
-      {/* MODALS DE CONFIRMATION */}
       <Modal show={showDeactivateModal} size="md" popup onClose={() => setShowDeactivateModal(false)}>
         <div className="p-6 text-center">
           <HiExclamationCircle className="mx-auto mb-4 h-14 w-14 mt-4" style={{ color: '#CE6A6B' }} />
