@@ -177,7 +177,6 @@ export default function CompanyProfileForm() {
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-3xl mt-10 mb-20">
       
-      {/* HEADER */}
       <div className="flex items-center gap-4 mb-6 pb-6 border-b border-gray-100">
         <div className="p-4 rounded-full" style={{ backgroundColor: '#CE6A6B', color: 'white' }}>
           <HiOfficeBuilding className="text-3xl" />
