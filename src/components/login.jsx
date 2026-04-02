@@ -20,8 +20,8 @@ export default function LoginUser() {
     
     // 2. On interroge le backend pour connaître l'état du profil
     // Attention : Vérifie que l'URL correspond bien au chemin de CurrentUserView dans ton urls.py (souvent /api/me/ ou /api/current-user/)
-    const response = await fetch("https://flowlance-api.onrender.com/api/me/", { 
-      method: "GET",
+  const response = await fetch("https://flowlance-api.onrender.com/api/users/me/", 
+    { method: "GET",
       headers: {
         "Authorization": `Bearer ${data.access}`,
         "Content-Type": "application/json"
