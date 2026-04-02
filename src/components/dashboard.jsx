@@ -13,6 +13,16 @@ export default function Dashboard() {
     const fetchUserRole = async () => {
       try {
         const userData = await getCurrentUser();
+        
+        if (!userData.is_profile_active) {
+          if (userData.role === 'FREELANCE') {
+            navigate("/freelance-profile");
+          } else {
+            navigate("/company-profile");
+          }
+          return; 
+        }
+
         setRole(userData.role); 
       } catch (error) {
         console.error("Erreur d'authentification:", error);

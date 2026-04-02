@@ -248,6 +248,19 @@ export default function FreelanceProfileForm() {
 
   return (
     <div className="max-w-6xl mx-auto relative pb-28"> 
+    <div className="flex justify-end gap-4 mb-4 mt-4 px-2">
+        {isActive && (
+          <Button color="light" onClick={() => navigate("/dashboard")} className="shadow-sm border-gray-200 font-bold text-navy">
+            ⬅ Retour au Tableau de bord
+          </Button>
+        )}
+        <button 
+          onClick={() => { localStorage.removeItem("token"); window.location.href="/login"; }} 
+          className="text-coral hover:text-red-700 underline font-bold px-4 py-2"
+        >
+          Se déconnecter
+        </button>
+      </div>
       <Card className="border-none shadow-2xl bg-white rounded-3xl overflow-hidden mb-6">
         <div className="p-6 bg-navy text-white">
           <h2 className="text-2xl font-black italic">MON ESPACE</h2>
