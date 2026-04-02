@@ -250,7 +250,7 @@ export default function FreelanceProfileForm() {
     <div className="max-w-6xl mx-auto relative pb-28"> 
       <Card className="border-none shadow-2xl bg-white rounded-3xl overflow-hidden mb-6">
         <div className="p-6 bg-navy text-white">
-          <h2 className="text-2xl font-black italic">MON ESPACE EXPERT</h2>
+          <h2 className="text-2xl font-black italic">MON ESPACE</h2>
         </div>
 
         {!isActive && (
@@ -367,11 +367,11 @@ export default function FreelanceProfileForm() {
                     <TextInput placeholder="https://linkedin.com/in/..." value={linkedinUrl} onChange={(e) => setLinkedinUrl(e.target.value)} />
                   </div>
                   <div>
-                    <Label className="font-bold mb-2 block">GitHub ou Dépôt</Label>
+                    <Label className="font-bold mb-2 block">Mon GitHub</Label>
                     <TextInput placeholder="https://github.com/..." value={githubUrl} onChange={(e) => setGithubUrl(e.target.value)} />
                   </div>
                   <div>
-                    <Label className="font-bold mb-2 block">Site personnel / Portfolio</Label>
+                    <Label className="font-bold mb-2 block">Mon site web</Label>
                     <TextInput placeholder="https://mon-site.com" value={websiteUrl} onChange={(e) => setWebsiteUrl(e.target.value)} />
                   </div>
                 </div>
@@ -480,7 +480,7 @@ export default function FreelanceProfileForm() {
               </div>
 
               <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                <h3 className="text-lg font-black text-navy mb-4 border-b pb-2">Langues Parlées</h3>
+                <h3 className="text-lg font-black text-navy mb-4 border-b pb-2">Langues</h3>
                 <div className="flex flex-col md:flex-row gap-4 items-end">
                   <div className="flex-1 w-full">
                     <Label className="font-bold text-xs uppercase block mb-1">Langue <span className="text-coral">*</span></Label>
@@ -564,7 +564,7 @@ export default function FreelanceProfileForm() {
                     style={{ backgroundColor: '#CE6A6B' }}
                   >
                     <HiPlusCircle className="mr-2 h-5 w-5" />
-                    {skills.length > 0 ? "Ajouter une autre" : "Ajouter"}
+                    {skills.length > 0 ? "Ajouter une autre" : "Ajouter ce Hard Skill"}
                   </button>
                 </div>
 
