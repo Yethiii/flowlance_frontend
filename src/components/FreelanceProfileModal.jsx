@@ -8,11 +8,13 @@ import {
 import { getFreelanceProfileById, getSectors, getSoftSkills } from "../services/api";
 
 export default function FreelanceProfileModal({ show, onClose, freelanceId }) {
+  // Etat local de la modale profil
   const [profile, setProfile] = useState(null);
   const [allSectors, setAllSectors] = useState([]);
   const [allSoftSkills, setAllSoftSkills] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Chargement des donnees du freelance selectionne
   useEffect(() => {
     if (show && freelanceId) {
       const fetchData = async () => {
@@ -38,6 +40,7 @@ export default function FreelanceProfileModal({ show, onClose, freelanceId }) {
 
   if (!show) return null;
 
+  // Helpers d'affichage
   const getAvailabilityText = (val) => {
     if (val === "FULL") return "Temps plein";
     if (val === "PART") return "Temps partiel";
@@ -72,6 +75,7 @@ export default function FreelanceProfileModal({ show, onClose, freelanceId }) {
 
   return (
     <Modal show={show} size="5xl" onClose={onClose}>
+      {/* En-tete de la modale */}
       <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white rounded-t-lg">
         <h3 className="text-2xl font-black text-navy flex items-center">
           <HiIdentification className="mr-3 text-coral h-7 w-7" /> Dossier Candidat Complet
@@ -79,6 +83,7 @@ export default function FreelanceProfileModal({ show, onClose, freelanceId }) {
         <button onClick={onClose} className="text-gray-400 hover:text-coral font-black text-xl transition-colors">X</button>
       </div>
 
+      {/* Contenu principal du dossier candidat */}
       <div className="p-8 bg-gray-50 max-h-[85vh] overflow-y-auto">
         {isLoading ? (
           <div className="flex justify-center py-20"><Spinner size="xl" className="text-coral" /></div>

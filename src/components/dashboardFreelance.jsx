@@ -15,6 +15,7 @@ import DirectChatModal from "./DirectChatModal";
 import { getFreelanceDashboardData, getAvailableJobOffers, getCompanyProfileById, applyToJob, getMyApplications,getNotificationsCount, getConversationsList } from "../services/api";
 
 export default function DashboardFreelance() {
+  // Etats globaux du dashboard freelance
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeView, setActiveView] = useState("Tableau de bord");
@@ -46,6 +47,7 @@ export default function DashboardFreelance() {
   const [directChatName, setDirectChatName] = useState("");
   const [isDirectChatOpen, setIsDirectChatOpen] = useState(false);
 
+  // Polling des notifications et conversations
   useEffect(() => {
     const fetchRealTimeData = async () => {
       try {
@@ -66,6 +68,7 @@ export default function DashboardFreelance() {
 
 
 
+  // Chargement des donnees du tableau de bord IA
   useEffect(() => {
     if (activeView === "Tableau de bord") {
       const fetchDashboardData = async () => {
@@ -91,6 +94,7 @@ export default function DashboardFreelance() {
     }
   }, [activeView]);
 
+  // Helpers et actions utilisateur
   const hasAlreadyApplied = (offerId) => {
     return myApplications.some(app => app.job_offer === offerId);
   };
@@ -143,6 +147,7 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-teal/5">
+      {/* Sidebar + navigation mobile */}
       <div className="md:hidden bg-navy p-4 flex justify-between items-center shadow-lg">
         <img src="/logo.png" alt="Logo" className="h-10" />
         <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-coral text-3xl"><HiMenu /></button>
@@ -170,6 +175,7 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
         </div>
       </aside>
 
+      {/* Zone de contenu principale */}
       <main className="flex-1 p-4 md:p-10 overflow-y-auto">
         {activeView === "Mon Profil" && <FreelanceProfileForm />}
         {activeView === "Trouver une mission" && <FreelanceJobBoard />}
@@ -256,6 +262,7 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
           </>
         )}
 
+        {/* Modal details mission */}
         <Modal show={isOfferModalOpen} size="3xl" onClose={() => setIsOfferModalOpen(false)}>
           <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white rounded-t-lg">
             <h3 className="text-xl font-bold text-navy">Détails de la mission</h3>
@@ -284,6 +291,7 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
           </div>
         </Modal>
 
+        {/* Modal candidature */}
         <Modal show={isApplyModalOpen} size="lg" onClose={() => !isApplying && setIsApplyModalOpen(false)}>
           <div className="p-6 border-b border-gray-100 flex justify-between bg-white rounded-t-lg">
             <h3 className="text-xl font-black text-navy">Envoyer ma candidature</h3>
@@ -308,6 +316,7 @@ const menuItems = ["Tableau de bord", "Trouver une mission", "Mes Candidatures",
           )}
         </Modal>
 
+        {/* Modal profil entreprise */}
         <Modal show={isCompanyModalOpen} size="2xl" onClose={() => setIsCompanyModalOpen(false)}>
           <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white rounded-t-lg">
             <h3 className="text-2xl font-black text-navy flex items-center"><HiOfficeBuilding className="mr-3 text-coral h-6 w-6" /> Profil de l'entreprise</h3>

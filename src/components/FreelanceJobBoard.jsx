@@ -10,6 +10,7 @@ import {
 } from '../services/api';
 
 export default function FreelanceJobBoard() {
+  // Etats principaux du job board
   const [offers, setOffers] = useState([]);
   const [sectors, setSectors] = useState([]);
   const [hardSkillsList, setHardSkillsList] = useState([]);
@@ -34,6 +35,7 @@ export default function FreelanceJobBoard() {
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
   const [isLoadingCompany, setIsLoadingCompany] = useState(false);
 
+  // Chargement initial des offres et referentiels
   useEffect(() => {
     fetchData();
   }, []);
@@ -60,6 +62,7 @@ export default function FreelanceJobBoard() {
     }
   };
 
+  // Helpers et actions utilisateur
   const hasAlreadyApplied = (offerId) => {
     return myApplications.some(app => app.job_offer === offerId);
   };
@@ -121,6 +124,7 @@ export default function FreelanceJobBoard() {
     }
   };
 
+  // Ecran de chargement
   if (isLoading) return <div className="flex justify-center my-20"><Spinner size="xl" /></div>;
 
   return (
@@ -131,6 +135,7 @@ export default function FreelanceJobBoard() {
         <p className="text-teal font-medium">Trouvez la mission qui correspond à vos compétences et postulez en un clic.</p>
       </div>
 
+      {/* Filtres de recherche */}
       <div className="bg-white p-6 rounded-3xl shadow-lg border-t-4 border-t-teal mb-10 flex flex-col md:flex-row gap-4 items-center">
         <div className="flex-1 relative w-full">
           <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
@@ -224,6 +229,7 @@ export default function FreelanceJobBoard() {
         </div>
       )}
 
+      {/* Modal details mission */}
       <Modal show={isOfferModalOpen} size="3xl" onClose={() => setIsOfferModalOpen(false)}>
         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white rounded-t-lg">
           <h3 className="text-xl font-bold text-navy">Détails de la mission</h3>
@@ -288,6 +294,7 @@ export default function FreelanceJobBoard() {
         </div>
       </Modal>
 
+      {/* Modal candidature */}
       <Modal show={isApplyModalOpen} size="lg" onClose={() => !isApplying && setIsApplyModalOpen(false)}>
         <div className="p-6 border-b border-gray-100 flex justify-between bg-white rounded-t-lg">
           <h3 className="text-xl font-black text-navy">Envoyer ma candidature</h3>
@@ -329,6 +336,7 @@ export default function FreelanceJobBoard() {
         )}
       </Modal>
 
+      {/* Modal profil entreprise */}
       <Modal show={isCompanyModalOpen} size="2xl" onClose={() => setIsCompanyModalOpen(false)}>
         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white rounded-t-lg">
           <h3 className="text-2xl font-black text-navy flex items-center">

@@ -38,6 +38,7 @@ export default function CompanyJobOffers() {
   const [aiKeywords, setAiKeywords] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
 
+  // Chargement initial des donnees
   useEffect(() => {
     fetchData();
   }, []);
@@ -62,6 +63,7 @@ export default function CompanyJobOffers() {
     }
   };
 
+  // Actions formulaire
   const handleOpenForm = (offer = null) => {
     setFormError("");
     if (offer) {
@@ -136,6 +138,7 @@ export default function CompanyJobOffers() {
     }
   };
 
+  // Actions sur les offres
   const handleDelete = async (id) => {
     if (window.confirm("Êtes-vous sûr de vouloir supprimer cette annonce ?")) {
       try {
@@ -166,6 +169,7 @@ export default function CompanyJobOffers() {
     }
   };
 
+  // Ecran de chargement
   if (isLoading) return <div className="flex justify-center my-20"><Spinner size="xl" /></div>;
 
   return (
@@ -227,6 +231,7 @@ export default function CompanyJobOffers() {
         </div>
       )}
 
+      {/* Modal de creation / edition */}
       <Modal show={isFormModalOpen} size="4xl" onClose={() => setIsFormModalOpen(false)}>
         <div className="p-6 max-h-[70vh] overflow-y-auto bg-white">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -376,6 +381,7 @@ export default function CompanyJobOffers() {
         </div>
       </Modal>
 
+      {/* Modal de previsualisation */}
       <Modal show={isPreviewModalOpen} size="3xl" onClose={() => setIsPreviewModalOpen(false)}>
         <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-white rounded-t-lg">
           <h3 className="text-xl font-bold text-navy">Aperçu de l'annonce</h3>
@@ -439,3 +445,4 @@ export default function CompanyJobOffers() {
     </div>
   );
 }
+

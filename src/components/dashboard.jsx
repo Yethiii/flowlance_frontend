@@ -5,10 +5,12 @@ import DashboardCompany from "./dashboardCompany";
 import { getCurrentUser } from "../services/api"; 
 
 export default function Dashboard() {
+  // Etat local du dashboard
   const navigate = useNavigate();
   const [role, setRole] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Chargement du role utilisateur
   useEffect(() => {
     const fetchUserRole = async () => {
       try {
@@ -36,6 +38,7 @@ export default function Dashboard() {
     fetchUserRole();
   }, [navigate]);
 
+  // Etat de chargement
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-navy">
@@ -47,6 +50,7 @@ export default function Dashboard() {
     );
   }
 
+  // Rendu selon le role
   if (role === "FREELANCE") {
     return <DashboardFreelance />;
   } else if (role === "COMPANY") {
@@ -55,3 +59,4 @@ export default function Dashboard() {
     return <div className="p-10 text-center text-xl text-coral font-bold">Rôle non défini dans la base de données.</div>;
   }
 }
+

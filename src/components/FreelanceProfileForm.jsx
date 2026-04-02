@@ -16,6 +16,7 @@ import {
 } from "../services/api";
 
 export default function FreelanceProfileForm() {
+  // Etats principaux du profil freelance
   const [profileId, setProfileId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [message, setMessage] = useState({ text: "", type: "" });
@@ -63,6 +64,7 @@ export default function FreelanceProfileForm() {
 
   const [existingCvUrl, setExistingCvUrl] = useState(null);
 
+  // Chargement initial du profil et des listes utiles
   useEffect(() => {
     const loadAllData = async () => {
       try {
@@ -104,6 +106,7 @@ export default function FreelanceProfileForm() {
     loadAllData();
   }, []);
 
+  // Sauvegarde globale du profil
   const handleGlobalSave = async () => {
     setMessage({ text: "Sauvegarde du profil en cours...", type: "info" });
     const formData = new FormData();
@@ -137,6 +140,7 @@ export default function FreelanceProfileForm() {
       setMessage({ text: "Erreur lors de la sauvegarde.", type: "error" }); }
   };
 
+  // Gestion du CV
   const handleCVSubmit = async () => {
    if (!cvFile) return;
     setCvUploading(true);
@@ -152,6 +156,7 @@ export default function FreelanceProfileForm() {
     finally { setCvUploading(false); setCvFile(null); }
   };
 
+  // Actions sensibles du compte
   const executeDeactivate = async () => {
     setShowDeactivateModal(false);
     try {
@@ -175,6 +180,7 @@ export default function FreelanceProfileForm() {
     }
   };
 
+  // Ajouts dynamiques dans les sections du profil
   const handleAddHardSkill = async () => {
     if (!newSkill.name || !newSkill.sector_id) return;
     await addSkill({ skill_name: newSkill.name, skill_level: newSkill.level, sector_id: newSkill.sector_id });
@@ -244,6 +250,7 @@ export default function FreelanceProfileForm() {
   const mesPermis = licenses.filter(l => permisTypes.includes(l.license_type));
   const mesLicencesPro = licenses.filter(l => !permisTypes.includes(l.license_type));
 
+  // Ecran de chargement
   if (isLoading) return <div className="text-center p-20"><Spinner size="xl" /></div>;
 
   return (
@@ -285,6 +292,7 @@ export default function FreelanceProfileForm() {
           </div>
         )}
 
+        {/* Navigation par onglets */}
         <Tabs variant="underline" className="px-6">
           
           <Tabs.Item active title="Profil Général" icon={HiUser}>
@@ -819,6 +827,7 @@ export default function FreelanceProfileForm() {
         </Tabs>
       </Card>
 
+      {/* Barre fixe de sauvegarde */}
       <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] p-4 z-50 flex justify-center">
         <button 
           onClick={handleGlobalSave} 
@@ -829,6 +838,7 @@ export default function FreelanceProfileForm() {
         </button>
       </div>
 
+      {/* Modal de suspension */}
       <Modal show={showDeactivateModal} size="md" popup onClose={() => setShowDeactivateModal(false)}>
         <div className="p-6 text-center">
           <HiExclamationCircle className="mx-auto mb-4 h-14 w-14 mt-4" style={{ color: '#CE6A6B' }} />
@@ -841,6 +851,7 @@ export default function FreelanceProfileForm() {
         </div>
       </Modal>
 
+      {/* Modal de suppression definitive */}
       <Modal show={showDeleteModal} size="md" popup onClose={() => setShowDeleteModal(false)}>
         <div className="p-6 text-center">
           <HiExclamationCircle className="mx-auto mb-4 h-14 w-14 mt-4" style={{ color: '#CE6A6B' }} />

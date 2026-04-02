@@ -10,6 +10,7 @@ import FreelanceProfileModal from "./FreelanceProfileModal";
 import DirectChatModal from "./DirectChatModal";
 
 export default function DashboardCompany() {
+  // Etats globaux du dashboard entreprise
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeView, setActiveView] = useState("Tableau de bord");
@@ -27,6 +28,7 @@ export default function DashboardCompany() {
   const [isDirectChatOpen, setIsDirectChatOpen] = useState(false);
 
 
+  // Chargement des recommandations IA
   useEffect(() => {
     if (activeView === "Tableau de bord") {
       const fetchMatches = async () => {
@@ -46,6 +48,7 @@ export default function DashboardCompany() {
     }
   }, [activeView]);
 
+  // Polling des notifications et conversations
   useEffect(() => {
     const fetchRealTimeData = async () => {
       try {
@@ -65,6 +68,7 @@ export default function DashboardCompany() {
   }, [activeView]);
   
 
+  // Actions utilisateur
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");
@@ -74,6 +78,7 @@ export default function DashboardCompany() {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-teal/5">
+      {/* Sidebar + navigation mobile */}
       <div className="md:hidden bg-navy p-4 flex justify-between items-center shadow-lg">
         <img src="/logo.png" alt="Logo" className="h-10" />
         <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-coral text-3xl"><HiMenu /></button>
@@ -106,6 +111,7 @@ export default function DashboardCompany() {
         </div>
       </aside>
 
+      {/* Zone de contenu principale */}
       <main className="flex-1 p-4 md:p-10 overflow-y-auto">
         {activeView === "Mon Entreprise" && <CompanyProfileForm />}
         {activeView === "Mes Annonces" && <CompanyJobOffers />}
@@ -222,12 +228,14 @@ export default function DashboardCompany() {
         
       </main>
 
+      {/* Modal profil freelance */}
       <FreelanceProfileModal 
         show={isCandidateModalOpen} 
         onClose={() => setIsCandidateModalOpen(false)} 
         freelanceId={selectedFreelanceId} 
       />
 
+      {/* Modal message rapide */}
       <Modal show={isMessageModalOpen} size="md" onClose={() => setIsMessageModalOpen(false)}>
         <div className="p-6 text-center bg-gray-50 rounded-lg">
           <HiOutlineChatAlt2 className="mx-auto mb-4 h-14 w-14 text-teal opacity-50" />
@@ -237,6 +245,7 @@ export default function DashboardCompany() {
         </div>
       </Modal>
 
+      {/* Modal chat direct */}
         <DirectChatModal 
         show={isDirectChatOpen} 
         onClose={() => setIsDirectChatOpen(false)} 

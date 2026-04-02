@@ -41,6 +41,7 @@ export default function CompanyProfileForm() {
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+  // Chargement initial du profil et des secteurs
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -83,6 +84,7 @@ export default function CompanyProfileForm() {
     fetchData();
   }, []);
 
+  // Sauvegarde du formulaire
   const handleSave = async () => {
     setIsSaving(true);
     setMessage({ text: "", type: "" });
@@ -149,6 +151,7 @@ export default function CompanyProfileForm() {
     }
   };
 
+  // Actions sensibles du compte
   const executeDeactivate = async () => {
     setShowDeactivateModal(false);
     try {
@@ -172,6 +175,7 @@ export default function CompanyProfileForm() {
     }
   };
 
+  // Ecran de chargement
   if (isLoading) return <div className="flex justify-center my-20"><Spinner size="xl" /></div>;
 
   return (
@@ -205,6 +209,7 @@ export default function CompanyProfileForm() {
         </div>
       )}
 
+    {/* Navigation par onglets */}
     <Tabs aria-label="Company Profile Tabs" className="mb-6">        
         <Tabs.Item active title="Identité & Contact" icon={HiOfficeBuilding}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
@@ -374,6 +379,7 @@ export default function CompanyProfileForm() {
         </button>
       </div>
 
+      {/* Modal de suspension */}
       <Modal show={showDeactivateModal} size="md" popup onClose={() => setShowDeactivateModal(false)}>
         <div className="p-6 text-center">
           <HiExclamationCircle className="mx-auto mb-4 h-14 w-14 mt-4" style={{ color: '#CE6A6B' }} />
@@ -386,6 +392,7 @@ export default function CompanyProfileForm() {
         </div>
       </Modal>
 
+      {/* Modal de suppression definitive */}
       <Modal show={showDeleteModal} size="md" popup onClose={() => setShowDeleteModal(false)}>
         <div className="p-6 text-center">
           <HiExclamationCircle className="mx-auto mb-4 h-14 w-14 mt-4" style={{ color: '#CE6A6B' }} />
@@ -401,3 +408,4 @@ export default function CompanyProfileForm() {
     </div>
   );
 }
+
