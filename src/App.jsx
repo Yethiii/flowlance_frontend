@@ -19,6 +19,8 @@ function App() {
             
             <Route path="/legal" element={<MentionsLegales />} />
 
+            <Route path="/profile" element={<div className="p-20 text-center text-3xl font-bold">Complétez votre profil ici !</div>} />
+
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
         </main>
