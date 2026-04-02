@@ -237,13 +237,16 @@ export default function CompanyProfileForm() {
             
             <div>
               <label className="block text-sm font-bold text-navy mb-2">Taille de l'entreprise</label>
-              <Select value={companySize} onChange={(e) => setCompanySize(e.target.value)}>
-                <option value="1-10">1-10 employés</option>
-                <option value="11-50">11-50 employés</option>
-                <option value="51-200">51-200 employés</option>
-                <option value="201-500">201-500 employés</option>
-                <option value="500+">Plus de 500 employés</option>
-              </Select>
+              <Select 
+                value={companySize} 
+                onChange={(e) => setCompanySize(e.target.value)}
+            >
+                <option value="">Choisir la taille...</option>
+                <option value="SMALL">1-10 employés</option>
+                <option value="MEDIUM">11-50 employés</option>
+                <option value="LARGE">50-250 employés</option>
+                <option value="CORP">Plus de 250 employés</option>
+            </Select>
             </div>
 
             <div className="md:col-span-2">
