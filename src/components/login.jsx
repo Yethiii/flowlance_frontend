@@ -14,14 +14,11 @@ export default function LoginUser() {
   setError(""); 
 
   try {
-    // 1. On connecte l'utilisateur
     const data = await loginUser({ email: email, password: password });
     localStorage.setItem("token", data.access);
     
-    // 2. On interroge le backend pour connaître l'état du profil
-    // Attention : Vérifie que l'URL correspond bien au chemin de CurrentUserView dans ton urls.py (souvent /api/me/ ou /api/current-user/)
-  const response = await fetch("https://flowlance-api.onrender.com/api/users/me/", 
-    { method: "GET",
+    const response = await fetch("https://flowlance-api.onrender.com/api/users/me/", { 
+      method: "GET",
       headers: {
         "Authorization": `Bearer ${data.access}`,
         "Content-Type": "application/json"
@@ -31,17 +28,19 @@ export default function LoginUser() {
     if (response.ok) {
       const userData = await response.json();
       
-      // 3. L'aiguillage logique
       if (userData.is_profile_active) {
         navigate("/dashboard");
       } else {
-        // Redirige vers la page de création/édition de profil 
-        // (Ajuste "/profile" selon le nom de ta vraie route React)
-        navigate("/profile"); 
+        if (userData.role === 'FREELANCE') {
+          navigate("/freelance-profile");
+        } else if (userData.role === 'COMPANY') {
+          navigate("/company-profile");
+        } else {
+          setError("Rôle non reconnu. Veuillez contacter le support.");
+        }
       }
     } else {
-      // Par sécurité, si la vérification échoue, on l'envoie sur son profil
-      navigate("/profile");
+      setError("Impossible de vérifier l'état du profil.");
     }
 
   } catch  {

@@ -5,6 +5,8 @@ import Dashboard from "./components/dashboard";
 import MentionsLegales from "./components/MentionsLegales";
 import CookieBanner from "./components/CookieBanner";
 import AppFooter from "./components/AppFooter";
+import FreelanceProfileForm from "./components/FreelanceProfileForm";
+import CompanyProfileForm from "./components/CompanyProfileForm";
 
 function App() {
   return (
@@ -19,7 +21,8 @@ function App() {
             
             <Route path="/legal" element={<MentionsLegales />} />
 
-            <Route path="/profile" element={<div className="p-20 text-center text-3xl font-bold">Complétez votre profil ici !</div>} />
+            <Route path="/freelance-profile" element={<FreelanceProfileForm />} />
+            <Route path="/company-profile" element={<CompanyProfileForm />} />
 
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
